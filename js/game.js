@@ -39,6 +39,7 @@
     paused: ['Paused', 'विराम'], retry: ['Try Again', 'फिर प्रयास'], next: ['Next Level', 'अगला स्तर'], complete: ['Level Complete', 'स्तर पूर्ण'], over: ['Not Yet', 'अभी नहीं'],
     chron: ['The Chronicle', 'कथा-क्रम'], goesOn: ['The story goes on', 'कथा आगे बढ़ती है'], locked: ['Locked', 'बंद'], soon: ['Coming in Part 1', 'भाग 1 में आ रहा है'],
     tapNext: ['Tap the glowing speaker  ·  Enter', 'चमकते पात्र को टैप करो  ·  Enter'], tapCont: ['Tap to continue  ·  Enter', 'आगे बढ़ने के लिए टैप करो  ·  Enter'],
+    enterBtn: ['ENTER', 'आगे'],
     talk: ['Talk', 'बात करो'], score: ['Score', 'अंक'], stars: ['Stars', 'तारे'], rules: ['Stars for this level', 'इस स्तर के तारे'], subtitle: ['Path of Dharma', 'धर्म पथ'],
     credit: ['Developed by Mr Boyjonauth Kevin · Bojo Solutions', 'विकासकर्ता: Mr Boyjonauth Kevin · Bojo Solutions'],
     rotate: ['Turn your phone sideways', 'अपना फ़ोन आड़ा करें'], playAnyway: ['Play anyway', 'फिर भी खेलें'],
@@ -102,7 +103,12 @@
   window.addEventListener('keyup', function (e) { var a = KEYMAP[e.code]; if (!a) return; rel(a); if (a === 'jump') rel('hold'); });
   // In demo mode the mode AI writes these instead of the player.
   var IN = {
-    mx: function () { if (AIC) return AIC.mx || 0; return (K.right ? 1 : 0) - (K.left ? 1 : 0); },
+    mx: function () {
+      if (AIC) return AIC.mx || 0;
+      var k = (K.right ? 1 : 0) - (K.left ? 1 : 0);
+      if (k) return k;
+      return (STICK.on && stickMode()) ? STICK.mx : 0;
+    },
     jumpP: function () { if (AIC) { var v = AIC.jumpP; AIC.jumpP = false; return v; } return took('jump'); },
     jumpHeld: function () { return AIC ? !!AIC.jumpHeld : !!K.jump; },
     downP: function () { if (AIC) { var v = AIC.downP; AIC.downP = false; return v; } return took('down'); },
@@ -115,9 +121,46 @@
     confirmP: function () { if (AIC) { var v = AIC.confirmP; AIC.confirmP = false; return v; } return took('confirm'); }
   };
   function clearInput() { for (var k in P) P[k] = 0; }
+  // One dialog step per gesture: read every advance key so a second one cannot fire next frame.
+  function consumeAdvance() { var a = IN.confirmP(), b = IN.atkP(), c = IN.jumpP(); return !!(a || b || c); }
 
   // pointers: menus, HUD buttons, on-screen touch buttons, zones and swipes
   var pointers = {};
+  // Floating stick. Origin is wherever the left thumb first lands; mx is analog -1..1.
+  var STICK = { on: false, id: null, ox: 0, oy: 0, kx: 0, ky: 0, mx: 0, my: 0, down: false, R: 86 };
+  function stickMode() {
+    if (!TOUCH || G.scene !== SC.play || !G.mode) return false;
+    var t = G.mode.touch;
+    if (t !== 'platform' && t !== 'noatk' && t !== 'duo' && t !== 'arena') return false;
+    if (G.mode.isTalking && G.mode.isTalking()) return false;
+    return true;
+  }
+  function stickEnd(p) {
+    if (p && p.id != null && STICK.id != null && p.id !== STICK.id) return;
+    if (STICK.down) { rel('down'); STICK.down = false; }
+    STICK.on = false; STICK.id = null; STICK.mx = 0; STICK.my = 0;
+  }
+  function stickReset() {
+    stickEnd();
+    for (var id in pointers) if (pointers[id]) pointers[id].stick = false;
+  }
+  function stickAt(p) {
+    if (STICK.down) { rel('down'); STICK.down = false; }
+    STICK.on = true; STICK.id = p.id; STICK.ox = p.x; STICK.oy = p.y; STICK.kx = p.x; STICK.ky = p.y; STICK.mx = 0; STICK.my = 0;
+    p.stick = true;
+  }
+  function stickApply(p) {
+    if (!STICK.on || p.id !== STICK.id) return;
+    var dx = p.x - STICK.ox, dy = p.y - STICK.oy, max = STICK.R, dist = Math.hypot(dx, dy);
+    if (dist > max && dist > 0) { dx *= max / dist; dy *= max / dist; dist = max; }
+    STICK.kx = STICK.ox + dx; STICK.ky = STICK.oy + dy;
+    var nx = max ? dx / max : 0, ny = max ? dy / max : 0, dead = 0.2;
+    function axis(v) { var a = Math.abs(v); if (a <= dead) return 0; return Math.sign(v) * Math.min(1, (a - dead) / (1 - dead)); }
+    STICK.mx = axis(nx); STICK.my = axis(ny);
+    var duck = ny > 0.42;
+    if (duck && !STICK.down) { STICK.down = true; press('down'); }
+    else if (!duck && STICK.down) { STICK.down = false; rel('down'); }
+  }
   function toV(e) { return { x: (e.clientX - OX) / VS, y: (e.clientY - OY) / VS }; }
   cv.addEventListener('pointerdown', function (e) {
     AU.init(); e.preventDefault();
@@ -130,14 +173,17 @@
   cv.addEventListener('pointermove', function (e) {
     var p = pointers[e.pointerId]; if (!p) return; var v = toV(e); p.x = v.x; p.y = v.y;
     var dx = p.x - p.sx, dy = p.y - p.sy, dtm = performance.now() - p.t0;
-    if (!p.swiped && dtm < 420 && Math.abs(dy) > 42 && Math.abs(dy) > Math.abs(dx) * 1.2 && G.scene === SC.play && G.mode && G.mode.swipes) {
+    var talking = G.scene === SC.play && G.mode && G.mode.isTalking && G.mode.isTalking();
+    if (!p.stick && !talking && !p.swiped && dtm < 420 && Math.abs(dy) > 42 && Math.abs(dy) > Math.abs(dx) * 1.2 && G.scene === SC.play && G.mode && G.mode.swipes) {
       p.swiped = true;
-      if (dy > 0) { press('down'); setTimeout(function () { rel('down'); }, 120); } else if (!p.act) { press('jump'); p.act = 'jump'; }
+      if (dy > 0) { press('down'); setTimeout(function () { rel('down'); }, 120); } else if (!p.act && !p.stick) { press('jump'); p.act = 'jump'; }
     }
+    if (p.stick) stickApply(p);
     if (G.scene && G.scene.move) G.scene.move(p);
   });
   function pUp(e) {
     var p = pointers[e.pointerId]; if (!p) return; delete pointers[e.pointerId];
+    if (p.stick) stickEnd(p);
     if (p.act) { rel(p.act); if (p.act === 'jump') rel('hold'); }
     if (G.scene && G.scene.up) G.scene.up(p);
   }
@@ -160,7 +206,7 @@
   // ---------------- game state ----------------
   var G = { t: 0, scene: null, mode: null, L: null, li: 0, si: 0, pips: 3, maxPips: 5, meter: 0, score: 0, stats: {}, cam: 0, tip: null, tipT: 0, demoTimer: 0, segName: null };
   var SC = {};
-  function setScene(s, arg) { if (G.scene && G.scene.leave) G.scene.leave(); G.scene = s; clearInput(); if (s.enter) s.enter(arg); }
+  function setScene(s, arg) { stickReset(); if (G.scene && G.scene.leave) G.scene.leave(); G.scene = s; clearInput(); if (s.enter) s.enter(arg); }
 
   // ---------------- heroes (painted sprite frames per state) ----------------
   var RUN6 = ['run0', 'run1', 'run2', 'run3', 'run4', 'run5'];
@@ -369,8 +415,11 @@
     if (this.i >= this.lines.length) { this.done = true; if (this.onDone) this.onDone(); }
   };
   Dialog.prototype.draw = function (g, hint) {
-    if (this.done) return;
-    var ln = this.cur(), who = CAST[ln.who] || CAST.narrator, bx = 26, bw = W - 52, bh = 128, by = H - bh - 14;
+    if (this.done) { lastDlgBox = null; return; }
+    var ln = this.cur(), who = CAST[ln.who] || CAST.narrator;
+    // On a phone the message sits at the top, so the bottom corners stay free for the stick and ENTER.
+    var bw = TOUCH ? W - 64 : W - 52, bh = 128, bx = TOUCH ? 32 : 26, by = TOUCH ? 96 : H - bh - 14;
+    lastDlgBox = { x: bx, y: by, w: bw, h: bh };
     ART.panel(g, bx, by, bw, bh, { r: 18 });
     var tx = bx + 26;
     if (who.sh) {
@@ -385,7 +434,7 @@
     ART.text(g, tr(who.name), tx, by + 32, { size: 19, gold: true, sw: 3 });
     var lines = ART.wrap(g, this.text().slice(0, Math.floor(this.ch)), bw - (tx - bx) - 30, SAVE.lang === 'hi' ? 22 : 21);
     for (var i = 0; i < lines.length && i < 3; i++) ART.text(g, lines[i], tx, by + 62 + i * 27, { size: SAVE.lang === 'hi' ? 22 : 21, col: ln.who === 'narrator' ? '#f6e6c4' : '#fff8ea', sw: 3 });
-    if (this.full()) {
+    if (this.full() && !TOUCH) {
       var a = 0.55 + 0.45 * Math.sin(G.t * 5);
       g.globalAlpha = a; ART.text(g, hint || T('tapCont'), bx + bw - 22, by + bh - 14, { size: 14, align: 'right', col: '#ffe9b0', sw: 3 }); g.globalAlpha = 1;
     }
@@ -401,17 +450,20 @@
     M.update = function (dt) {
       M.t += dt; dlg.update(dt);
       if (M.doneT != null) { M.doneT -= dt; if (M.doneT <= 0) M.done = true; }
-      if (IN.confirmP() || IN.atkP() || IN.jumpP()) dlg.advance();
+      if (consumeAdvance()) dlg.advance();
     };
     M.tap = function (x, y) {
-      if (dlg.done) return;
-      if (!dlg.full()) { dlg.advance(); return; }
+      if (dlg.done) return false;
+      // Touch: anywhere queues a single confirm. The ENTER button is only a label for that same tap.
+      if (TOUCH) { press('confirm'); return 'confirm'; }
+      if (!dlg.full()) { dlg.advance(); return true; }
       var ns = nextSpeaker();
-      if (y > H - 150) { dlg.advance(); return; }
-      if (!ns) { dlg.advance(); return; }
+      if (y > H - 150) { dlg.advance(); return true; }
+      if (!ns) { dlg.advance(); return true; }
       var b = box(ns); if (x > b[0] && x < b[2] && y > b[1] && y < b[3]) dlg.advance(); else { M.nudge = 0.5; AU.sfx('click'); }
+      return true;
     };
-    M.ai = function (c) { if (dlg.full() && dlg.wait > 0.7) { var ns = nextSpeaker(); if (ns) { var b = box(ns); M.tap((b[0] + b[2]) / 2, (b[1] + b[3]) / 2); } else dlg.advance(); dlg.wait = 0; } };
+    M.ai = function (c) { if (dlg.full() && dlg.wait > 0.7) { c.confirmP = true; dlg.wait = 0; } };
     M.draw = function () {
       var z = 1.1 + Math.sin(M.t * 0.08) * 0.02;
       ART.plate(g, th.plate, M.t * 6, 1, W, H, -10, z);
@@ -435,6 +487,8 @@
       dlg.draw(g, ns ? T('tapNext') : T('tapCont'));
     };
     M.dlg = dlg;
+    M.message = function () { return dlg.done ? null : dlg; };
+    M.isTalking = function () { return !dlg.done; };
     return M;
   }
 
@@ -521,15 +575,16 @@
       return true;
     }
     M.tap = function (x, y) {
-      if (dlg) { dlg.advance(); return true; }
+      if (dlg && !dlg.done) { if (TOUCH) { press('confirm'); return 'confirm'; } dlg.advance(); return true; }
+      if (M.endDlg && !M.endDlg.done) { if (TOUCH) { press('confirm'); return 'confirm'; } M.endDlg.advance(); return true; }
       var n = talkable(); if (n) { var sx = n.x - G.cam; if (Math.abs(x - sx) < 110 && y > GY - 260 && y < GY + 20) { openTalk(n); return true; } }
       return false;
     };
     M.drillFail = function (msg) { if (DEMO && seg.drill) { G.stats.drillRetries++; M.restart = true; return; } M.restart = true; G.stats.drillRetries++; banner(msg || T('drillFail'), tr(seg.drillName), 1.8); };
     M.update = function (dt) {
       M.t += dt;
-      if (dlg) { dlg.update(dt); if (IN.confirmP() || IN.atkP() || IN.jumpP()) dlg.advance(); return; }
-      if (M.endDlg) { M.endDlg.update(dt); if (IN.confirmP() || IN.atkP() || IN.jumpP()) M.endDlg.advance(); if (M.doneT != null) { M.doneT -= dt; if (M.doneT <= 0) M.done = true; } return; }
+      if (dlg) { dlg.update(dt); if (consumeAdvance()) dlg.advance(); return; }
+      if (M.endDlg) { M.endDlg.update(dt); if (consumeAdvance()) M.endDlg.advance(); if (M.doneT != null) { M.doneT -= dt; if (M.doneT <= 0) M.done = true; } return; }
       // tag (L8)
       if (party.length > 1 && IN.tagP()) { ai = 1 - ai; AU.sfx('click'); pop(active().x, active().y - 170, active().id === 'rama' ? 'Rama' : 'Lakshmana', '#fff2c0', 20); ART.spawn('ring', active().x, active().y - 60, { r: 12, life: 0.4, col: 'rgba(255,240,180,0.9)', speed: 0 }); }
       var h = active();
@@ -632,7 +687,7 @@
       var tx = clamp(h.x - W * 0.4, 0, Math.max(0, len - W)); G.cam += (tx - G.cam) * Math.min(1, dt * 6);
       AU.setIntensity(0.3 + (foes.some(function (f) { return !f.dead && Math.abs(f.x - h.x) < 600; }) ? 0.6 : 0) + (boar && !boar.dead && Math.abs(boar.x - h.x) < 700 ? 0.6 : 0));
     };
-    M.updateEndDlg = function (dt) { if (M.endDlg) { M.endDlg.update(dt); if (IN.confirmP() || IN.atkP() || IN.jumpP()) M.endDlg.advance(); } };
+    M.updateEndDlg = function (dt) { if (M.endDlg) { M.endDlg.update(dt); if (consumeAdvance()) M.endDlg.advance(); } };
     function boarHit(dmg, who) {
       boar.hp -= dmg; boar.flash = 0.18; sparks(boar.x, GY - 60, '#ffe0a0', 10); AU.sfx('thunk'); hitstop(0.04); shake(4);
       if (who) { boar.lastBy = boar.lastBy || {}; boar.lastBy[who] = M.t; var other = who === 'rama' ? 'lak' : 'rama'; if (boar.lastBy[other] != null && M.t - boar.lastBy[other] < 1.6 && M.t - (boar.togT || -9) > 1.6) { boar.togT = M.t; G.stats.together++; pop(boar.x, GY - 150, T('together'), '#9affc0', 26); AU.sfx('perfect'); } }
@@ -844,7 +899,8 @@
       if (party.length > 1) ART.text(g, (active().id === 'rama' ? '➶ Rama' : '⚔ Lakshmana') + '   ⇄ Q', 20, 100, { size: 16, col: '#fff2c0' });
     };
     M.restartSeg = function () { return PlatformMode(seg, L); };
-    M.isTalking = function () { return !!dlg || !!M.endDlg; };
+    M.isTalking = function () { return !!((dlg && !dlg.done) || (M.endDlg && !M.endDlg.done)); };
+    M.message = function () { return (dlg && !dlg.done) ? dlg : ((M.endDlg && !M.endDlg.done) ? M.endDlg : null); };
     M.flags = flags; M.targets = targets; M.foes = foes; M.items = items; M.npcs = npcs; M.world = w; M.boarRef = function () { return boar; };
     return M;
   }
@@ -1583,6 +1639,7 @@
     startSeg(si || 0);
   }
   function startSeg(i) {
+    stickReset();
     G.si = i; var seg = G.L.segs[i]; if (!seg.theme) seg.theme = G.L.theme;
     ART.clearParts(); FX.pops.length = 0; G.tip = null; G.tipT = 0; G.segPips = G.pips; G.segT = 0;
     G.mode = makeMode(seg); G.segName = seg.type;
@@ -1610,25 +1667,63 @@
 
   // ---------------- HUD / touch ----------------
   var HUDB = { pause: { x: 0, y: 14, w: 46, h: 46 }, sound: { x: 0, y: 14, w: 46, h: 46 } };
+  var lastDlgBox = null, lastTipBox = null;
   function layoutHud() { HUDB.pause.x = W - 60; HUDB.sound.x = W - 114; }
   function inB(b, x, y) { return x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h; }
+  function messageOpen() {
+    var m = G.mode; if (!m || G.scene !== SC.play) return false;
+    if (m.kind === 'story') { var d = m.message && m.message(); return !!d && !d.done; }
+    return !!(m.isTalking && m.isTalking());
+  }
+  function showEnter() { return !!(TOUCH && messageOpen()); }
+  function enterGeom() { var w = 188, h = 96, m = 32; return { x: W - w - m, y: H - h - m, w: w, h: h }; }
+  function drawEnter() {
+    var b = enterGeom(), cx = b.x + b.w / 2, cy = b.y + b.h / 2;
+    var d = G.mode && G.mode.message && G.mode.message();
+    var ready = !d || !d.full || d.full();
+    var pulse = ready ? (0.55 + 0.45 * Math.sin(G.t * 4)) : 0.35;
+    g.save();
+    var halo = g.createRadialGradient(cx, cy, b.h * 0.2, cx, cy, 150);
+    halo.addColorStop(0, 'rgba(255,210,110,' + (0.28 * pulse) + ')');
+    halo.addColorStop(0.55, 'rgba(255,170,50,' + (0.22 * pulse) + ')');
+    halo.addColorStop(1, 'rgba(255,150,40,0)');
+    g.fillStyle = halo; g.beginPath(); g.arc(cx, cy, 150, 0, 6.283); g.fill();
+    g.restore();
+    ART.glow(g, cx, cy, 120, 'rgba(255,200,90,' + pulse + ')', 1);
+    ART.button(g, { x: b.x, y: b.y, w: b.w, h: b.h, label: T('enterBtn'), primary: true, size: 28 }, !!K.confirm);
+  }
+  function drawStick() {
+    if (!stickMode()) return;
+    if (!STICK.on) return;
+    g.save();
+    g.globalAlpha = 0.45;
+    g.fillStyle = 'rgba(24,10,4,0.78)';
+    g.beginPath(); g.arc(STICK.ox, STICK.oy, STICK.R, 0, 6.283); g.fill();
+    g.lineWidth = 3; g.strokeStyle = 'rgba(242,207,106,0.95)'; g.stroke();
+    g.globalAlpha = 0.28; g.beginPath(); g.moveTo(STICK.ox, STICK.oy); g.lineTo(STICK.kx, STICK.ky); g.lineWidth = 6; g.strokeStyle = '#f2cf6a'; g.stroke();
+    g.globalAlpha = 0.96;
+    var gr = g.createRadialGradient(STICK.kx - 6, STICK.ky - 8, 4, STICK.kx, STICK.ky, 32);
+    gr.addColorStop(0, '#fff6d8'); gr.addColorStop(1, '#c47a28');
+    g.fillStyle = gr; g.beginPath(); g.arc(STICK.kx, STICK.ky, 30, 0, 6.283); g.fill();
+    g.lineWidth = 2.5; g.strokeStyle = '#fff0b0'; g.stroke();
+    g.restore();
+  }
   function touchLayout() {
     var m = G.mode, t = m && m.touch, L = [];
-    if (!TOUCH || !t || t === 'story') return L;
+    if (!TOUCH || !t || t === 'story' || showEnter()) return L;
     if (t === 'runner') return [{ zone: 'left', act: 'jump', label: T('hold') === 'HOLD' ? 'JUMP' : 'कूदो' }, { zone: 'right', act: 'atk', label: G.mode && G.L.segs[G.si].jumpOnly ? '' : '⚔' }];
     if (t === 'hold') return [{ zone: 'left', act: 'hold', label: T('hold') }, { zone: 'right', act: 'tap', label: T('tap') }];
-    L.push({ x: 84, y: H - 78, r: 46, act: 'left', label: '◀' }, { x: 196, y: H - 78, r: 46, act: 'right', label: '▶' });
-    L.push({ x: W - 92, y: H - 92, r: 56, act: 'jump', label: 'JUMP' });
+    L.push({ x: W - 100, y: H - 108, r: 58, act: 'jump', label: 'JUMP' });
     var hero = G.mode.hero && G.mode.hero.A;
-    if (t === 'noatk') L.push({ x: W - 214, y: H - 66, r: 42, act: 'confirm', label: '💬' });
-    else L.push({ x: W - 214, y: H - 66, r: 44, act: 'atk', label: hero && !hero.melee ? '➶' : '⚔' });
-    L.push({ x: W - 92, y: H - 206, r: 32, act: 'down', label: '▼' });
-    if (t === 'arena') L.push({ x: W - 320, y: H - 60, r: 40, act: 'block', label: 'BLOCK' });
-    if (t === 'duo') L.push({ x: W - 206, y: H - 176, r: 34, act: 'tag', label: '⇄' });
+    if (t === 'noatk') L.push({ x: W - 228, y: H - 78, r: 46, act: 'confirm', label: '💬' });
+    else L.push({ x: W - 230, y: H - 76, r: 48, act: 'atk', label: hero && !hero.melee ? '➶' : '⚔' });
+    if (t === 'arena') L.push({ x: W - 348, y: H - 74, r: 42, act: 'block', label: 'BLOCK' });
+    if (t === 'duo') L.push({ x: W - 224, y: H - 196, r: 36, act: 'tag', label: '⇄' });
     return L;
   }
   function drawTouch() {
-    var L = touchLayout(); if (!L.length) return;
+    if (showEnter()) drawEnter();
+    var L = touchLayout();
     L.forEach(function (b) {
       if (b.zone) {
         var x0 = b.zone === 'left' ? 0 : W / 2, down = !!K[b.act];
@@ -1636,6 +1731,7 @@
         if (b.label) { g.globalAlpha = 0.5; ART.text(g, b.label, x0 + W / 4, H - 26, { size: 18, align: 'center', col: '#ffe9b0' }); g.globalAlpha = 1; }
       } else ART.touchBtn(g, b.x, b.y, b.r, b.label, !!K[b.act]);
     });
+    drawStick();
   }
   function hudTop() {
     layoutHud();
@@ -1655,22 +1751,28 @@
     // tip
     if (G.tip && G.tipT > 0 && !(m && m.isTalking && m.isTalking())) {
       var a = Math.min(1, G.tipT, (8 - Math.min(8, G.tipT)) * 4 + 0.2); g.globalAlpha = Math.min(1, a);
-      var lines = ART.wrap(g, G.tip, Math.min(640, W - 340), 17), tw = 0; g.font = ART.font(17); lines.forEach(function (l) { tw = Math.max(tw, g.measureText(l).width); });
-      var bh = 18 + lines.length * 22, by = m && m.kind === 'story' ? 80 : H - bh - (TOUCH ? 150 : 18);
-      ART.panel(g, W / 2 - tw / 2 - 18, by, tw + 36, bh, { r: 12, plain: true }); lines.forEach(function (l, k) { ART.text(g, l, W / 2, by + 26 + k * 22, { size: 17, align: 'center', col: '#fff2d8' }); });
+      var lines = ART.wrap(g, G.tip, Math.min(560, W - 160), 17), tw = 0; g.font = ART.font(17); lines.forEach(function (l) { tw = Math.max(tw, g.measureText(l).width); });
+      var bh = 18 + lines.length * 22, by = TOUCH ? 132 : (m && m.kind === 'story' ? 80 : H - bh - 18);
+      var tx = W / 2 - tw / 2 - 18; lastTipBox = { x: tx, y: by, w: tw + 36, h: bh };
+      ART.panel(g, tx, by, tw + 36, bh, { r: 12, plain: true }); lines.forEach(function (l, k) { ART.text(g, l, W / 2, by + 26 + k * 22, { size: 17, align: 'center', col: '#fff2d8' }); });
       g.globalAlpha = 1;
     }
   }
   function drawPops(cam) {
-    FX.pops.forEach(function (p) { var k = p.t / 1.1, x = p.screen ? p.x : p.x - cam, y = p.y - k * 50; g.globalAlpha = Math.max(0, 1 - k * k); ART.text(g, p.txt, x, y, { size: p.size * (1 + Math.max(0, 0.25 - p.t) * 1.2), align: 'center', col: p.col, sw: 4, bold: true }); });
+    FX.pops.forEach(function (p, i) {
+      var k = p.t / 1.1, x = p.screen ? p.x : p.x - cam, y = p.y - k * 50;
+      if (TOUCH && (p.screen || y > H - 220)) { x = W / 2; y = 168 + (i % 3) * 28 - k * 36; }
+      g.globalAlpha = Math.max(0, 1 - k * k); ART.text(g, p.txt, x, y, { size: p.size * (1 + Math.max(0, 0.25 - p.t) * 1.2), align: 'center', col: p.col, sw: 4, bold: true });
+    });
     g.globalAlpha = 1;
     if (FX.banner) {
       var b = FX.banner, k2 = b.t / b.dur, a = Math.min(1, b.t * 4, (1 - k2) * 4);
       g.globalAlpha = Math.max(0, a);
+      var mid = TOUCH ? H * 0.52 : H * 0.36;
       var gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, 'rgba(20,8,2,0)'); gr.addColorStop(0.5, 'rgba(20,8,2,0.7)'); gr.addColorStop(1, 'rgba(20,8,2,0)');
-      g.fillStyle = gr; g.fillRect(0, H * 0.36 - 44, W, b.sub ? 96 : 70);
-      ART.text(g, b.txt, W / 2, H * 0.36 + 6, { size: 38, align: 'center', kind: 'title', gold: true, sw: 6, bold: true });
-      if (b.sub) ART.text(g, b.sub, W / 2, H * 0.36 + 38, { size: 18, align: 'center', col: '#fff0d0' });
+      g.fillStyle = gr; g.fillRect(0, mid - 44, W, b.sub ? 96 : 70);
+      ART.text(g, b.txt, W / 2, mid + 6, { size: 38, align: 'center', kind: 'title', gold: true, sw: 6, bold: true });
+      if (b.sub) ART.text(g, b.sub, W / 2, mid + 38, { size: 18, align: 'center', col: '#fff0d0' });
       g.globalAlpha = 1;
     }
   }
@@ -1739,8 +1841,8 @@
       var hi = SAVE.lang === 'hi', c1 = 80, c2 = W / 2 + 10, y = 110;
       var kb = hi ? [['चलना', '← → / A D'], ['कूदना (दबाए = ऊँचा, दोबारा = दोहरी)', 'Space / ↑ / W'], ['फिसलना / झुकना', '↓ / S'], ['वार / बाण (2 टैप भारी, 3 = विशेष)', 'J / K / X'], ['रोकना (अखाड़ा)', 'Shift / L'], ['भाई बदलो (स्तर 8)', 'Q / Tab / E'], ['बात / आगे', 'Enter'], ['विराम · ध्वनि', 'P / Esc · M']]
         : [['Move', '← → / A D'], ['Jump (hold = higher, again = double)', 'Space / ↑ / W'], ['Slide / crouch', '↓ / S'], ['Strike / shoot (2 taps heavy, 3 = special)', 'J / K / X'], ['Block (arena)', 'Shift / L'], ['Switch brother (Level 8)', 'Q / Tab / E'], ['Talk / continue', 'Enter'], ['Pause · Sound', 'P / Esc · M']];
-      var tc = hi ? ['प्लेटफ़ॉर्मर: ◀ ▶ बटन, JUMP, ⚔/➶, ▼', 'दौड़: बायाँ भाग = कूदो, दायाँ = वार, नीचे स्वाइप = फिसलो', 'अखाड़ा: BLOCK बटन भी', 'ध्यान / धनुर्विद्या: बायाँ भाग दबाए रखो, दायाँ टैप करो', 'कथा: चमकते पात्र को टैप करो']
-        : ['Platformer: ◀ ▶ buttons, JUMP, ⚔/➶, ▼', 'Runner: left half = jump, right half = strike, swipe down = slide', 'Arena: adds a BLOCK button', 'Focus / meditation: hold the left side, tap the right side', 'Story: tap the glowing speaker'];
+      var tc = hi ? ['बाएँ छड़ी से चलो। नीचे = फिसलो / झुको। दाएँ: JUMP, ⚔/➶, BLOCK, ⇄', 'दौड़: बायाँ भाग कूदो, दायाँ वार, नीचे स्वाइप फिसलो', 'ध्यान: बायाँ दबाए रखो, दायाँ टैप। कथा: कहीं भी टैप या ENTER']
+        : ['Left stick moves. Stick down slides or ducks. Right: JUMP, ⚔/➶, BLOCK, ⇄', 'Runner: left half jumps, right half strikes, swipe down slides', 'Focus: hold left, tap right. Story: tap anywhere or ENTER'];
       ART.text(g, hi ? 'कीबोर्ड' : 'Keyboard', c1, y, { size: 19, gold: true }); ART.text(g, hi ? 'स्पर्श (मोबाइल, आड़ा)' : 'Touch (phone, landscape)', c2, y, { size: 19, gold: true });
       kb.forEach(function (r, i) { ART.text(g, r[0], c1, y + 30 + i * 30, { size: 15 }); ART.text(g, r[1], c2 - 30, y + 30 + i * 30, { size: 15, align: 'right', col: '#ffd27a' }); });
       tc.forEach(function (r, i) { var ls = ART.wrap(g, '• ' + r, W - c2 - 70, 15); ls.forEach(function (l, k) { ART.text(g, l, c2, y + 30 + i * 46 + k * 19, { size: 15 }); }); });
@@ -1855,23 +1957,20 @@
       if (inB(HUDB.pause, p.x, p.y)) { setScene(SC.pause); return; }
       if (inB(HUDB.sound, p.x, p.y)) { AU.setMuted(!AU.isMuted()); SAVE.mute = AU.isMuted(); persist(); return; }
       var m = G.mode;
-      if (m.kind === 'story') { m.tap(p.x, p.y); return; }
-      if (m.tap && m.tap(p.x, p.y)) return;
+      if (m.kind === 'story') { var rs = m.tap(p.x, p.y); if (rs === 'confirm') p.act = 'confirm'; return; }
+      if (m.tap) { var rt = m.tap(p.x, p.y); if (rt === 'confirm') { p.act = 'confirm'; return; } if (rt) return; }
       var L = touchLayout();
       for (var i = 0; i < L.length; i++) {
         var b = L[i], hit = b.zone ? (b.zone === 'left' ? p.x < W / 2 : p.x >= W / 2) && p.y > 110 : Math.hypot(p.x - b.x, p.y - b.y) < b.r * 1.25;
-        if (hit) { p.act = b.act; press(b.act); if (b.act === 'jump') press('hold'); if (b.act === 'tap') press('atk'); if (b.act === 'hold') { /* held */ } vibe(8); return; }
+        if (hit) { p.act = b.act; press(b.act); if (b.act === 'jump') press('hold'); if (b.act === 'tap') press('atk'); vibe(8); return; }
       }
-      if (m.kind === 'platform' && !TOUCH) { /* mouse click on world: nothing */ }
+      if (stickMode() && p.y > 100 && p.x < W * 0.5 && p.x < W - 300) { stickAt(p); vibe(6); }
     },
-    move: function (p) {
-      if (!p.act || (p.act !== 'left' && p.act !== 'right')) return;
-      var want = p.x < 140 ? 'left' : p.x < 300 ? 'right' : null;
-      if (want && want !== p.act) { rel(p.act); p.act = want; press(want); }
-    },
+    move: function (p) { if (p.stick) stickApply(p); },
     up: function (p) { if (p.act) { rel(p.act); if (p.act === 'jump') rel('hold'); } },
     draw: function () {
       if (!G.mode) return;
+      lastDlgBox = null; lastTipBox = null;
       G.mode.draw();
       ART.drawParts(g, G.cam, true);
       drawPops(G.mode.kind === 'arena' || G.mode.kind === 'archery' || G.mode.kind === 'meditate' || G.mode.kind === 'beat' ? 0 : G.cam);
@@ -1991,7 +2090,7 @@
   window.__rpd = {
     startLevel: function (n, si) { AU.init(); startLevel(n - 1, si || 0); setScene(SC.play); return true; },
     toTitle: function () { setScene(SC.title); },
-    state: function () { var m = G.mode; return { scene: G.scene && G.scene.name, level: G.L && G.L.n, seg: G.si, segType: G.L && G.L.segs[G.si] && G.L.segs[G.si].type, segs: G.L && G.L.segs.length, pips: G.pips, score: Math.round(G.score), stats: G.stats, result: G.result || null, fail: G.failMsg || null, hero: m && m.hero && m.hero.x != null ? { x: Math.round(m.hero.x), y: Math.round(m.hero.y) } : null, demo: DEMO, W: W, unlocked: SAVE.unlocked, segLog: G.segLog, day: G.day, focusLives: G.focusLives, levelT: G.levelT, ai: m && m.aiObj ? JSON.stringify(m.aiObj) : null, tleft: m && m.targets ? m.targets.filter(function (t) { return !t.dead; }).map(function (t) { return Math.round(t.x) + ',' + Math.round(t.y); }).join(' ') : null, flags: m && m.flags ? JSON.stringify(m.flags) : null, hitLog: m && m.hitLog ? m.hitLog.join(' ') : null }; },
+    state: function () { var m = G.mode; return { scene: G.scene && G.scene.name, level: G.L && G.L.n, seg: G.si, segType: G.L && G.L.segs[G.si] && G.L.segs[G.si].type, segs: G.L && G.L.segs.length, pips: G.pips, score: Math.round(G.score), stats: G.stats, result: G.result || null, fail: G.failMsg || null, hero: m && m.hero && m.hero.x != null ? { x: Math.round(m.hero.x), y: Math.round(m.hero.y), slide: m.hero.slideT > 0 ? 1 : 0 } : null, demo: DEMO, W: W, H: H, ox: OX, oy: OY, vs: VS, line: m && m.message ? (function () { var d = m.message(); return d && !d.done ? d.i : -1; })() : null, full: m && m.message ? (function () { var d = m.message(); return d && !d.done && d.full() ? 1 : 0; })() : 0, stick: STICK.on ? Math.round(STICK.mx * 100) / 100 : 0, dlgY: lastDlgBox ? lastDlgBox.y : null, dlgH: lastDlgBox ? lastDlgBox.h : null, tipY: lastTipBox ? lastTipBox.y : null, tipH: lastTipBox ? lastTipBox.h : null, enter: showEnter() ? enterGeom() : null, acts: (G.scene === SC.play && G.mode) ? touchLayout().map(function (b) { return b.zone ? ('zone:' + b.zone) : b.act; }) : [], unlocked: SAVE.unlocked, segLog: G.segLog, day: G.day, focusLives: G.focusLives, levelT: G.levelT, ai: m && m.aiObj ? JSON.stringify(m.aiObj) : null, tleft: m && m.targets ? m.targets.filter(function (t) { return !t.dead; }).map(function (t) { return Math.round(t.x) + ',' + Math.round(t.y); }).join(' ') : null, flags: m && m.flags ? JSON.stringify(m.flags) : null, hitLog: m && m.hitLog ? m.hitLog.join(' ') : null }; },
     advance: function (sec) { var n = Math.round(sec * 60), s0 = G.scene; for (var i = 0; i < n; i++) { step(1 / 60); if (G.scene !== s0) break; } render(); return this.state(); },
     press: function (a) { press(a); if (a === 'jump') press('hold'); if (a === 'atk' || a === 'confirm') press('tap'); if (G.scene && G.scene.key) G.scene.key(a); },
     release: function (a) { rel(a); if (a === 'jump') rel('hold'); },

@@ -20,13 +20,13 @@ Every asset is embedded in `js/assets.js`, so the game also runs from `file://`.
 ## Controls
 | Action | Keyboard | Touch (landscape) |
 |---|---|---|
-| Move | ← → / A D | ◀ ▶ |
-| Jump (hold = higher, again in air = double) | Space / ↑ / W | JUMP · runner: left half |
-| Slide / crouch | ↓ / S | ▼ · swipe down |
+| Move | ← → / A D | Left-thumb stick (platform, arena). Runner auto-runs. |
+| Jump (hold = higher, again in air = double) | Space / ↑ / W | JUMP button · runner: left half. Not stick-up. |
+| Slide / crouch | ↓ / S | Stick down · swipe down · runner: swipe down |
 | Strike / shoot (2 quick = heavy/charged, 3 with full meter = special) | J / K / X | ⚔ / ➶ · runner: right half |
 | Block (arena) | Shift / L | BLOCK |
 | Switch brother (L8) | Q / Tab / E | ⇄ |
-| Talk / continue | Enter | tap the NPC / the glowing speaker |
+| Talk / continue | Enter | ENTER button, or tap anywhere on a story or message |
 | Focus modes (L5 drill 2, L6, L7) | hold Space, tap J | hold left half, tap right half |
 | Pause · mute | P / Esc · M | ⏸ · 🔊 |
 
