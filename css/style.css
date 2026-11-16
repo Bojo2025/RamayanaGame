@@ -1,0 +1,6 @@
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overscroll-behavior: none; }
+#game { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; display: block; touch-action: none; outline: none; -webkit-tap-highlight-color: transparent; }
+#rotate { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 18px; background: radial-gradient(circle at 50% 40%, #4a2010, #120602 70%); color: #ffe9c0; font: 20px Georgia, serif; text-align: center; z-index: 5; }
+#rotate .ph { font-size: 64px; animation: rot 1.8s ease-in-out infinite; }
+#rotate button { font: 17px Georgia, serif; color: #3a1404; background: linear-gradient(#ffd77a, #c0641a); border: 2px solid #fff0b0; border-radius: 24px; padding: 10px 24px; }
+@keyframes rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
