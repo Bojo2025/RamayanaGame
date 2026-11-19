@@ -57,7 +57,7 @@ async function play(page, wallMs) {
     page.on('pageerror', (e) => errors.push(String(e)));
     await page.goto(FILE + '?unlock=1&touch=0', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.__rpdReady && window.__rpdAssets2, null, { timeout: 30000 });
-    await page.evaluate(() => { window.__rpd.freeze(true); window.__rpd.scene('select'); window.__rpd.advance(1.2); });
+    await page.evaluate(() => { window.__rpd.freeze(true); window.__rpd.scene('select'); window.__rpd.advance(2.6); });
     await shot(page, '00_chronicle.jpg');
     await page.evaluate(() => { window.__rpd.scene('card', 8); window.__rpd.advance(0.4); window.__rpd.render(); });
     await shot(page, '00_level9_card.jpg');
@@ -65,16 +65,16 @@ async function play(page, wallMs) {
     await page.close();
   }
 
-  for (const n of [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]) {
+  for (const n of [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]) {
     const desk = await boot(browser, n, { viewport: desktop, touch: false });
     await desk.page.evaluate(() => window.__rpd.advance(1.2));
     await shot(desk.page, 'L' + n + '_desktop.jpg');
     const st = await play(desk.page, n === 9 ? 90000 : n === 14 ? 90000 : 70000);
     if (st.scene === 'complete') await shot(desk.page, 'L' + n + '_complete.jpg');
     let soon = null;
-    if (n === 19 && st.scene === 'complete') {
+    if (n === 24 && st.scene === 'complete') {
       soon = await desk.page.evaluate(() => { window.__rpd.press('confirm'); return window.__rpd.advance(0.6); });
-      await shot(desk.page, 'L19_to_be_continued.jpg');
+      await shot(desk.page, 'L24_to_be_continued.jpg');
     }
     report.push({
       level: n, viewport: 'desktop', scene: st.scene, seg: st.seg, segType: st.segType,

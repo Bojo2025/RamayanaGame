@@ -50,8 +50,13 @@ Every asset is embedded in `js/assets.js`, so the game also runs from `file://`.
 17. Parashurama Encounter: a short clash that ends when he recognises Rama and departs. He is not killed.
 18. Kaikeyi's Demand: Manthara's whisper, then the court. Rama hears the two boons and accepts them.
 19. Leaving Ayodhya: the city follows the three to the gate, then a gentle road opens.
+20. Early Forest Travel: a runner through the first shade, toward a clearing.
+21. The Forest Dwelling: clear Panchavati by day, keep a flame through the night, and find the hut standing at dawn.
+22. Forest Demon Encounters: three fixed-screen bouts in the clearing.
+23. Shurpanakha Approaches: she proposes, she is refused, and the visit turns into a path.
+24. Shurpanakha's Attack: play as Lakshmana. She flees, wounded in her pride, toward Khara and Ravana. The bout is not a killing.
 
-After level 19 the game shows a "to be continued" card. Levels 20–30 stay listed in the chronicle (`js/levels2.js`). Painted art for 9–19 loads from `js/assets2.js` after the opening eight, so levels 1–8 still start on the original file.
+After level 24 the game shows a "to be continued" card. Levels 25–30 stay listed in the chronicle (`js/levels2.js`). Painted art for 9–24 loads from `js/assets2.js` after the opening eight, so levels 1–8 still start on the original file.
 
 ## Structure
 ```
@@ -61,8 +66,8 @@ js/audio.js    WebAudio: Indian-classical procedural score (tanpura, tabla, bans
 js/art.js      parallax plates, scenery layers, textured ground, particles, weather, fog, glow, UI widgets
 js/sprites.js  atlas drawing (feet anchors, flip, tint, portraits)
 js/levels.js   levels 1–8 as data (bilingual EN/HI)
-js/levels2.js  playable levels 9–19; titles for 20–30
-js/assets2.js  lazy-loaded plates and sprites for levels 9–19
+js/levels2.js  playable levels 9–24; titles for 25–30
+js/assets2.js  lazy-loaded plates and sprites for levels 9–24
 js/game.js     loop, input, physics, the six play modes, menus, save, demo autopilot, test hooks
 tools/test_levels_9_14.js  Playwright: autopilot levels 9–14, smoke 1 and 8, screenshots
 ```

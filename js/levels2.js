@@ -25,6 +25,7 @@
   CAST.kaikeyi = { sh: 'puppet_kaikeyi', fr: 'stand', name: L('Kaikeyi', 'कैकेयी') };
   CAST.manthara = { sh: 'puppet_manthara', fr: 'stand', name: L('Manthara', 'मंथरा') };
   CAST.para = { sh: 'parashurama', fr: 'ready', name: L('Parashurama', 'परशुराम') };
+  CAST.shurpa = { sh: 'shurpanakha_story', fr: 'composed', name: L('Shurpanakha', 'शूर्पणखा') };
   CAST.gate = { sh: 'lanka_guards', fr: 'captain0', name: L('Captain of the gate', 'द्वार का सेनापति') };
 
   var LEVELS = window.RPD_LEVELS;
@@ -255,10 +256,10 @@
           ['ramaA', 'Then I will not look at you as a prize, princess. I will look at the bow when the king asks, and not before.', 'तो मैं आपको पुरस्कार की तरह नहीं देखूँगा, राजकुमारी। जब राजा कहेंगे, तब मैं धनुष को देखूँगा, उससे पहले नहीं।']
         ]) },
       { type: 'platform', hero: 'ramaA', theme: 'hall', len: 3400, noAttack: true, music: 'calm',
-        ground: [[0, 1020], [1220, 3400]],
-        plats: [{ x: 980, y: 330, w: 160, k: 'daisSteps' }, { x: 1680, y: 300, w: 220, k: 'daisSteps' }, { x: 2480, y: 250, w: 180, k: 'ledgeBamboo' }],
-        solids: [{ x: 1500, w: 70, h: 150, k: 'pillarLotus' }],
-        items: [{ t: 'lotus', x: 2560, y: 250, hidden: true }],
+        bgPar: 0, bgY: -420, bgZoom: 2.05, noMid: true, hazeA: 0.06,
+        ground: [[0, 1280], [1500, 3400]],
+        plats: [{ x: 1880, y: 378, w: 150, k: 'daisSteps' }],
+        items: [{ t: 'lotus', x: 1955, y: 378, hidden: true }],
         npcs: [
           { id: 'janaka', x: 1860, face: -1, key: 'janaka', lines: D([
             ['janaka', 'The other princes have looked, and they have sat down again. I will not shame them by naming the weight.', 'दूसरे राजकुमार देख चुके हैं, और फिर बैठ गए हैं। मैं उस भार का नाम लेकर उन्हें लज्जित नहीं करूँगा।'],
@@ -273,9 +274,9 @@
         ],
         decor: [{ k: 'pillarLotus', sh: 'terrain_9_30', x: 420, s: 0.7 }, { k: 'vessels', sh: 'props_9_30', x: 700, s: 0.45 }, { k: 'goldLotus', sh: 'props_9_30', x: 2100, s: 0.4 }],
         checkpoints: [60, 1300, 2300],
-        tips: [{ x: 40, t: L('Cross the hall. Speak with Janaka, then with Sita. A lotus is hidden on the high step.', 'सभागृह पार करो। पहले जनक से, फिर सीता से बात करो। ऊँची सीढ़ी पर एक कमल छिपा है।') },
-          { x: 860, t: L('The gap is narrow. One jump, or two if you hesitate.', 'खाई संकरी है। एक छलांग, या हिचकिचाओ तो दो।') }],
-        goal: { x: 3180, k: 'pinaka', need: ['janaka', 'sita'],
+        tips: [{ x: 40, t: L('The bow stays on its dais. Walk the floor in front of it. Speak with Janaka, then with Sita.', 'धनुष अपनी वेदिका पर रहता है। उसके आगे की भूमि पर चलो। पहले जनक से, फिर सीता से बात करो।') },
+          { x: 1100, t: L('The gap is in the floor, not on the bow. One jump, or two if you hesitate. A lotus sits on the low step.', 'खाई भूमि में है, धनुष पर नहीं। एक छलांग, या हिचकिचाओ तो दो। नीची सीढ़ी पर एक कमल है।') }],
+        goal: { x: 3180, k: 'mark', need: ['janaka', 'sita'],
           blocked: L('Speak with Janaka and with Sita first.', 'पहले जनक से और सीता से बात करो।'),
           line: D([['ramaA', 'So this is the Pinaka. It does not look like a test. It looks like a thing that has been waiting.', 'तो यह पिनाक है। यह परीक्षा जैसा नहीं लगता। यह किसी प्रतीक्षा करती वस्तु जैसा लगता है।']]) } }
     ]
@@ -418,12 +419,165 @@
     ]
   });
 
+  // ---------------------------------------------------------------- 20
+  LEVELS.push({
+    n: 20, plate: 'bg20', title: L('Early Forest Travel', 'वन-यात्रा का आरंभ'), hero: 'ramaA', theme: 'deepforest',
+    mode: L('Runner', 'दौड़'), music: { raga: 'bhairav', lead: 'flute' },
+    intro: L('The forest does not know your name yet. Run the path. Clear what hunts. Reach the clearing.', 'वन अभी तुम्हारा नाम नहीं जानता। पथ दौड़ो। जो शिकार करे उसे हटाओ। समाई तक पहुँचो।'),
+    stars: [L('Finish the level', 'स्तर पूरा करो'), L('Clear 8 beasts', '8 पशु हटाओ'), L('Take one hit or fewer', 'एक या कम चोट खाओ')],
+    star2: { stat: 'smash', min: 8 }, star3: { stat: 'hits', max: 1 },
+    segs: [
+      { type: 'story', theme: 'deepforest', cast: [{ id: 'ramaA', x: 0.32, face: 1, s: 1.08 }, { id: 'lakA', x: 0.55, face: -1, s: 1.05 }, { id: 'sitaA', x: 0.76, face: -1, s: 1.02 }],
+        lines: D([
+          ['narrator', 'South of the river, the trees close their ranks. This is not yet Panchavati. This is only the road that teaches the feet.', 'नदी के दक्षिण में वृक्ष अपनी पंक्ति कस लेते हैं। यह अभी पंचवटी नहीं। यह केवल वह मार्ग है जो पैरों को सिखाता है।'],
+          ['lakA', 'Boar, and something smaller that laughs. I will walk behind Sita. You take the front, brother.', 'सूअर, और कुछ छोटा जो हँसता है। मैं सीता के पीछे चलूँगा। आगे आप रहें, भैया।'],
+          ['sitaA', 'Do not make a war of a path. Clear what stands in it, and leave the rest to the trees.', 'मार्ग का युद्ध मत बनाओ। जो उसमें खड़ा हो उसे हटाओ, शेष वृक्षों पर छोड़ दो।'],
+          ['ramaA', 'A clearing by dusk. That is the whole ambition of today.', 'संध्या तक एक समाई। आज की पूरी आकांक्षा यही है।']
+        ]) },
+      { type: 'runner', hero: 'ramaA', theme: 'deepforest', len: 22000, speed: 390, speedMax: 450, seed: 20, music: 'play',
+        phases: [
+          { until: 7000, set: ['gap', 'boar', 'branch', 'rock'], name: L('The first shade', 'पहली छाया') },
+          { until: 14000, set: ['imp', 'branch', 'boar', 'gap', 'wolf'], name: L('Things that follow', 'जो पीछे आते हैं') },
+          { until: 21000, set: ['gap', 'imp', 'boulder', 'branch', 'boar'], name: L('Toward a clearing', 'समाई की ओर') }
+        ],
+        tips: [{ x: 40, t: L('Jump gaps, slide branches, loose arrows at boars and the small laughers.', 'खाई पर कूदो, डालियों के नीचे फिसलो, सूअरों और छोटे हँसने वालों पर बाण छोड़ो।') }],
+        endText: L('A clearing', 'एक समाई') },
+      { type: 'story', theme: 'deepforest', cast: [{ id: 'ramaA', x: 0.4, face: 1, s: 1.08 }, { id: 'sitaA', x: 0.66, face: -1, s: 1.02 }],
+        lines: D([
+          ['sitaA', 'The trees step back here. I can see sky.', 'यहाँ वृक्ष पीछे हटते हैं। मुझे आकाश दिखता है।'],
+          ['ramaA', 'Not home. A place to stop. Tomorrow we look for water and a ground that will hold a hut.', 'घर नहीं। रुकने की जगह। कल हम जल खोजेंगे, और ऐसी भूमि जो एक कुटिया सँभाल सके।']
+        ]) }
+    ]
+  });
+
+  // ---------------------------------------------------------------- 21
+  LEVELS.push({
+    n: 21, plate: 'bg21', title: L('The Forest Dwelling', 'वन की कुटिया'), hero: 'ramaA', theme: 'panch',
+    mode: L('Platformer', 'प्लेटफ़ॉर्मर'), music: { raga: 'bhupali', lead: 'flute' },
+    intro: L('Panchavati. Clear the ground, raise the hut, and keep a small fire through the first night.', 'पंचवटी। भूमि साफ़ करो, कुटिया उठाओ, और पहली रात एक छोटी अग्नि बचाए रखो।'),
+    stars: [L('Finish the level', 'स्तर पूरा करो'), L('Keep the night fire above 50%', 'रात्रि की अग्नि 50% से ऊपर रखो'), L('Take one hit or fewer', 'एक या कम चोट खाओ')],
+    star2: { stat: 'altarMin', min: 50 }, star3: { stat: 'hits', max: 1 },
+    segs: [
+      { type: 'story', theme: 'panch', cast: [{ id: 'ramaA', x: 0.28, face: 1, s: 1.08 }, { id: 'sitaA', x: 0.52, face: -1, s: 1.02 }, { id: 'lakA', x: 0.76, face: -1, s: 1.05 }],
+        lines: D([
+          ['narrator', 'They choose a bend of the Godavari where five trees stand close enough to be a wall, and far enough to be a sky.', 'वे गोदावरी के एक मोड़ को चुनते हैं, जहाँ पाँच वृक्ष दीवार जितने पास हैं, और आकाश जितने दूर।'],
+          ['sitaA', 'Here. The water is near, and the ground is honest. I will not miss a palace that cannot follow us.', 'यहीं। जल पास है, और भूमि सच्ची है। मैं उस महल को नहीं पूछूँगी जो हमारे साथ नहीं आ सकता।'],
+          ['lakA', 'Then I take the night side. Whatever comes out of the trees meets me before it meets the fire.', 'तो रात का पक्ष मैं लेता हूँ। वृक्षों से जो भी निकले, अग्नि से पहले मुझसे मिले।'],
+          ['ramaA', 'First the ground. Then the hut. Then we learn what the dark wants.', 'पहले भूमि। फिर कुटिया। फिर हम जानेंगे कि अँधेरा क्या चाहता है।']
+        ]) },
+      { type: 'platform', hero: 'ramaA', partner: 'lakA', theme: 'panch', len: 2800, music: 'play',
+        ground: [[0, 2800]],
+        plats: [{ x: 900, y: 340, w: 170, k: 'ledgeRoots' }, { x: 1600, y: 300, w: 160, k: 'logBridge' }],
+        foes: [{ t: 'raider', x: 700, hp: 3 }, { t: 'raider', x: 1400, hp: 3 }, { t: 'brute', x: 2100, hp: 5 }],
+        decor: [{ k: 'bamboo', sh: 'scenery_9_30', x: 280, s: 0.7 }, { k: 'mango', sh: 'scenery_9_30', x: 1200, s: 0.65 }, { k: 'fern', sh: 'scenery_9_30', x: 2000, s: 0.5 }],
+        checkpoints: [60, 1100, 1900],
+        tips: [{ x: 40, t: L('Clear the ground. Rama shoots, Lakshmana strikes. ⇄ switches. The hut waits at the far trees.', 'भूमि साफ़ करो। राम बाण चलाते हैं, लक्ष्मण वार करते हैं। ⇄ से बदलो। कुटिया दूर के वृक्षों पर प्रतीक्षा करती है।') }],
+        goal: { x: 2580, k: 'hut', line: D([['sitaA', 'It is small. It will do. A house is a decision, not a size.', 'यह छोटी है। काम चलेगी। घर एक निर्णय है, नाप नहीं।']]) } },
+      { type: 'defend', hero: 'ramaA', partner: 'lakA', theme: 'panchNight', music: 'arena', altarX: 0.28, gap: 1.45,
+        waves: [['raider', 'raider'], ['raider', 'brute']],
+        decor: [{ k: 'leafHut', sh: 'props_9_30', x: 70, s: 0.7 }],
+        tips: [{ t: L('Night. The ringed flame by the hut is the one that must last until dawn.', 'रात। कुटिया के पास वलय वाली लौ ही वह है जिसे प्रभात तक रहना है।') }] },
+      { type: 'story', theme: 'panch', cast: [{ id: 'ramaA', x: 0.3, face: 1, s: 1.05 }, { id: 'sitaA', x: 0.52, face: 1, s: 1.0 }, { id: 'lakA', x: 0.74, face: -1, s: 1.05, fr: 'guard' }],
+        lines: D([
+          ['narrator', 'Dawn finds the hut still standing, and the fire low but alive. The Godavari makes its ordinary noise, as if the night had been a rumour.', 'प्रभात कुटिया को खड़ी पाता है, और अग्नि को मंद पर जीवित। गोदावरी अपनी साधारण ध्वनि करती है, मानो रात केवल एक अफवाह रही हो।'],
+          ['lakA', 'They will come back larger. Tonight was only a question.', 'वे और बड़े होकर लौटेंगे। आज रात केवल एक प्रश्न था।'],
+          ['ramaA', 'Then we have answered it once. That is how a dwelling begins.', 'तो हमने उसे एक बार उत्तर दे दिया। कुटिया ऐसे ही आरंभ होती है।']
+        ]) }
+    ]
+  });
+
+  // ---------------------------------------------------------------- 22
+  LEVELS.push({
+    n: 22, plate: 'bg22', title: L('Forest Demon Encounters', 'वन के राक्षस'), hero: 'ramaA', theme: 'demons',
+    mode: L('Arena', 'अखाड़ा'), music: { raga: 'bhairav', lead: 'flute' },
+    intro: L('Three come out of the trees, one after another. Hold the clearing. Lakshmana guards the hut behind you.', 'तीन वृक्षों से निकलते हैं, एक के बाद एक। समाई सँभालो। लक्ष्मण तुम्हारे पीछे कुटिया की रखवाली करते हैं।'),
+    stars: [L('Finish the level', 'स्तर पूरा करो'), L('Land 3 perfect shots', '3 सटीक बाण लगाओ'), L('Take one hit or fewer', 'एक या कम चोट खाओ')],
+    star2: { stat: 'perfect', min: 3 }, star3: { stat: 'hits', max: 1 },
+    segs: [
+      { type: 'story', theme: 'demons', cast: [{ id: 'ramaA', x: 0.34, face: 1, s: 1.08 }, { id: 'lakA', x: 0.66, face: -1, s: 1.05, fr: 'guard' }],
+        lines: D([
+          ['narrator', 'The question comes back with company. Not an army. Three who have decided the hut is an insult.', 'प्रश्न संग लेकर लौटता है। सेना नहीं। तीन, जिन्होंने मान लिया है कि कुटिया एक अपमान है।'],
+          ['lakA', 'I stay on the hut. If one gets past you, he still meets me.', 'मैं कुटिया पर रहता हूँ। यदि एक आपके पार निकल भी गया, तब भी वह मुझसे मिलेगा।'],
+          ['ramaA', 'Then the clearing is mine. One at a time. I will not chase them into the trees.', 'तो समाई मेरी है। एक-एक करके। मैं उन्हें वृक्षों के भीतर नहीं खदेड़ूँगा।']
+        ]) },
+      { type: 'arena', hero: 'ramaA', theme: 'demons', music: 'arena',
+        lose: L('The clearing is lost', 'समाई खो गई'),
+        roster: [
+          { id: 'raiderF', hp: 36, name: L('Forest raider', 'वन का राक्षस') },
+          { id: 'raiderF', hp: 42, name: L('Forest raider', 'वन का राक्षस') },
+          { id: 'bruteF', hp: 64, name: L('The large one', 'वह बड़ा वाला') }
+        ],
+        tips: [{ t: L('Fixed ground. Block the high strike, jump the sweep, shoot when they are open.', 'स्थिर भूमि। ऊँचा वार रोको, नीचे के वार पर कूदो, जब वे खुले हों तब बाण छोड़ो।') }] },
+      { type: 'story', theme: 'panch', cast: [{ id: 'sitaA', x: 0.34, face: 1, s: 1.02 }, { id: 'ramaA', x: 0.62, face: -1, s: 1.05 }],
+        lines: D([
+          ['sitaA', 'The hut heard it. I kept the fire. You kept them off the step.', 'कुटिया ने सुना। मैंने अग्नि रखी। तुमने उन्हें सीढ़ी से दूर रखा।'],
+          ['ramaA', 'There will be more. A sister of theirs walks these woods. I have not seen her yet. I think the trees have.', 'और भी आएँगे। उनकी एक बहन इन वनों में चलती है। मैंने उसे अभी नहीं देखा। मुझे लगता है वृक्षों ने देखा है।']
+        ]) }
+    ]
+  });
+
+  // ---------------------------------------------------------------- 23
+  LEVELS.push({
+    n: 23, plate: 'bg21', title: L('Shurpanakha Approaches', 'शूर्पणखा का आगमन'), hero: 'ramaA', theme: 'panch',
+    mode: L('Story + Platformer', 'कथा + प्लेटफ़ॉर्मर'), music: { raga: 'yaman', lead: 'flute' },
+    intro: L('A woman comes to the hut with a proposal. Hear her. Refuse her plainly. The path after that is no longer a visit.', 'एक स्त्री प्रस्ताव लेकर कुटिया पर आती है। उसे सुनो। स्पष्ट मना करो। उसके बाद का मार्ग मुलाकात नहीं रहता।'),
+    stars: [L('Finish the level', 'स्तर पूरा करो'), L('Hear her offer and the refusal', 'उसका प्रस्ताव और अस्वीकार सुनो'), L('Cross the path without a fall', 'बिना गिरे पथ पार करो')],
+    star2: { stat: 'offer', min: 1 }, star3: { stat: 'falls', max: 0 },
+    segs: [
+      { type: 'story', theme: 'panch', cast: [{ id: 'shurpa', x: 0.26, face: 1, s: 1.02 }, { id: 'ramaA', x: 0.52, face: -1, s: 1.05 }, { id: 'sitaA', x: 0.76, face: -1, s: 1.0 }],
+        lines: [
+          Line('narrator', 'She comes in the afternoon, alone, and she does not bother to pretend she is lost.', 'वह दोपहर में आती है, अकेली, और यह बहाना नहीं करती कि वह भटक गई है।', { pose: { shurpa: 'composed' } }),
+          Line('shurpa', 'I am Shurpanakha. These woods know my brothers better than they know you. You are beautiful, archer. Come with me. Leave the hut.', 'मैं शूर्पणखा हूँ। ये वन मेरे भाइयों को तुमसे बेहतर जानते हैं। तुम सुंदर हो, धनुर्धर। मेरे साथ चलो। कुटिया छोड़ दो।', { pose: { shurpa: 'offer', ramaA: 'idle' }, stat: 'offer' }),
+          Line('ramaA', 'I am married. She is standing beside the fire you are pretending not to see. I will not go, and I will not be cruel about the answer.', 'मेरा विवाह हो चुका है। वह उस अग्नि के पास खड़ी है जिसे तुम देखकर भी अनदेखा कर रही हो। मैं नहीं जाऊँगा, और उत्तर में क्रूर नहीं होऊँगा।', { pose: { shurpa: 'offer', sitaA: 'idle' } }),
+          Line('sitaA', 'You may drink water. You may sit. You may not shop for my husband as if he were a garland.', 'तुम जल पी सकती हो। बैठ सकती हो। मेरे पति को माला की तरह नहीं चुन सकतीं।', { pose: { sitaA: 'idle', shurpa: 'angry' } }),
+          Line('shurpa', 'A wife who speaks. How small a kingdom this hut is. Keep him, then. The woods will not stay this polite.', 'एक पत्नी जो बोलती है। यह कुटिया कितना छोटा राज्य है। तो उसे रखो। वन इतना विनम्र नहीं रहेगा।', { pose: { shurpa: 'turnAway' } })
+        ] },
+      { type: 'platform', hero: 'ramaA', partner: 'lakA', theme: 'panch', len: 2400, music: 'play',
+        ground: [[0, 900], [1120, 2400]],
+        plats: [{ x: 980, y: 360, w: 140, k: 'logBridge' }],
+        foes: [{ t: 'raider', x: 1600, hp: 3 }],
+        decor: [{ k: 'bamboo', sh: 'scenery_9_30', x: 400, s: 0.65 }, { k: 'fern', sh: 'scenery_9_30', x: 1700, s: 0.5 }],
+        checkpoints: [60, 1200],
+        tips: [{ x: 40, t: L('She has left the hut. Follow the path. The gap is only a gap. One raider is only a raider.', 'वह कुटिया छोड़ चुकी है। पथ पर चलो। खाई केवल खाई है। एक राक्षस केवल एक राक्षस है।') }],
+        npcs: [{ id: 'shurpa', x: 2000, face: -1, key: 'shurpa', lines: [
+          Line('shurpa', 'Tell your brother with the sword that I am not finished. I am going where my brothers can hear a complaint.', 'अपने तलवार वाले भाई से कहना कि मैं समाप्त नहीं हुई। मैं वहाँ जा रही हूँ जहाँ मेरे भाई एक शिकायत सुन सकें।', { pose: { shurpa: 'angry' } }),
+          Line('ramaA', 'Go, then. Do not come back to this fire with a crowd.', 'तो जाओ। इस अग्नि पर भीड़ लेकर मत लौटना।', { pose: { shurpa: 'turnAway' } })
+        ] }],
+        goal: { x: 2260, k: 'mark', need: ['shurpa'],
+          blocked: L('She is still on the path. Hear her last words.', 'वह अभी पथ पर है। उसके अंतिम शब्द सुनो।') } }
+    ]
+  });
+
+  // ---------------------------------------------------------------- 24
+  LEVELS.push({
+    n: 24, plate: 'bg22', title: L("Shurpanakha's Attack", 'शूर्पणखा का आक्रमण'), hero: 'lakA', theme: 'demons',
+    mode: L('Arena', 'अखाड़ा'), music: { raga: 'bhairav', lead: 'flute' },
+    intro: L('You are Lakshmana. She comes back to hurt Sita. Stop her. The bout ends when she breaks and runs — not in a killing.', 'तुम लक्ष्मण हो। वह सीता को चोट पहुँचाने लौटती है। उसे रोको। मुक़ाबला तब समाप्त होता है जब वह टूटकर भागती है — वध में नहीं।'),
+    stars: [L('Finish the level', 'स्तर पूरा करो'), L('Land 2 perfect blows', '2 सटीक प्रहार करो'), L('Take no hit', 'कोई चोट नहीं')],
+    star2: { stat: 'perfect', min: 2 }, star3: { stat: 'sparHits', max: 0 },
+    segs: [
+      { type: 'story', theme: 'demons', cast: [{ id: 'shurpa', x: 0.24, face: 1, s: 1.02, fr: 'angry' }, { id: 'sitaA', x: 0.5, face: -1, s: 1.0 }, { id: 'lakA', x: 0.74, face: -1, s: 1.08, fr: 'guard' }],
+        lines: D([
+          ['narrator', 'She comes back before the story she went to tell. The proposal is over. What remains is rage, and it is aimed at Sita.', 'वह अपनी कही जाने वाली कथा से पहले ही लौट आती है। प्रस्ताव समाप्त हो चुका है। जो बचा है वह क्रोध है, और वह सीता की ओर है।'],
+          ['shurpa', 'You spoke. Now bleed for the speaking. He would have come with me if you had been quiet.', 'तुमने बोला। अब बोलने का मूल्य चुकाओ। यदि तुम चुप रहतीं, तो वह मेरे साथ आता।'],
+          ['lakA', 'Brother is at the river. I am here. You will not touch her. Put the nails down, or I will make you leave.', 'भैया नदी पर हैं। मैं यहाँ हूँ। तुम उन्हें छू नहीं पाओगी। नख नीचे करो, नहीं तो मैं तुम्हें यहाँ से निकलवा दूँगा।'],
+          ['sitaA', 'Lakshmana. Stop her. Do not make a spectacle of her. She is angry, and she is still a person.', 'लक्ष्मण। उसे रोको। उसका तमाशा मत बनाओ। वह क्रोधित है, और फिर भी एक व्यक्ति है।']
+        ]) },
+      { type: 'arena', hero: 'lakA', foe: 'shurpa', foeHp: 72, foeName: L('Shurpanakha', 'शूर्पणखा'), theme: 'demons', music: 'arena', yieldAt: 0.4,
+        yieldLine: L('She breaks away', 'वह छिटककर भागती है'),
+        lose: L('She reaches Sita', 'वह सीता तक पहुँच जाती है'),
+        tips: [{ t: L('Lakshmana\'s sword. Block, jump the sweep, strike the opening. She flees when her pride fails. Do not chase a killing.', 'लक्ष्मण की तलवार। रोको, नीचे के वार पर कूदो, खुलाव पर वार करो। जब उसका गर्व टूटे, वह भागती है। वध के लिए पीछा मत करना।') }] },
+      { type: 'story', theme: 'panch', cast: [{ id: 'lakA', x: 0.3, face: 1, s: 1.05 }, { id: 'ramaA', x: 0.52, face: -1, s: 1.05 }, { id: 'sitaA', x: 0.74, face: -1, s: 1.0 }],
+        lines: D([
+          ['narrator', 'She runs. Not cut apart for the audience, and not dead. Wounded in her pride, humiliated, and already composing the story she will tell Khara, and after Khara, Ravana.', 'वह भागती है। दर्शकों के लिए काटी हुई नहीं, और मरी हुई नहीं। गर्व में घायल, अपमानित, और पहले से वह कथा गढ़ती हुई जिसे वह खर को सुनाएगी, और खर के बाद रावण को।'],
+          ['lakA', 'I struck to drive her off. She is gone toward her brothers. I am not proud of the noise.', 'मैंने उसे खदेड़ने के लिए वार किया। वह अपने भाइयों की ओर गई है। मैं इस शोर पर गर्व नहीं करता।'],
+          ['sitaA', 'You kept your sword a sword. Thank you. I am still here.', 'तुमने अपनी तलवार को तलवार ही रहने दिया। धन्यवाद। मैं अभी भी यहाँ हूँ।'],
+          ['ramaA', 'Then the forest has our names now, and her brothers will have a version of today that we will not like. We keep the hut. We do not go hunting a humiliated woman.', 'तो वन के पास अब हमारे नाम हैं, और उसके भाइयों के पास आज का एक रूप होगा जो हमें पसंद नहीं आएगा। हम कुटिया रखते हैं। हम एक अपमानित स्त्री का शिकार नहीं करते।']
+        ]) }
+    ]
+  });
+
   window.RPD_LATER = [
-    [20, L('Early Forest Travel', 'वन-यात्रा का आरंभ'), L('Runner', 'दौड़')],
-    [21, L('Establishing the Forest Dwelling', 'वन में कुटिया'), L('Platformer', 'प्लेटफ़ॉर्मर')],
-    [22, L('Forest Demon Encounters', 'वन के राक्षस'), L('Arena', 'अखाड़ा')],
-    [23, L('Shurpanakha Approaches', 'शूर्पणखा का आगमन'), L('Story + Platformer', 'कथा + प्लेटफ़ॉर्मर')],
-    [24, L("Shurpanakha's Attack", 'शूर्पणखा का आक्रमण'), L('Arena', 'अखाड़ा')],
     [25, L('The Golden Deer', 'स्वर्ण मृग'), L('Runner', 'दौड़')],
     [26, L('Lakshmana Drawn Away', 'लक्ष्मण का जाना'), L('Platformer + Story', 'प्लेटफ़ॉर्मर + कथा')],
     [27, L("Ravana's Approach and the Line", 'रावण का आगमन और रेखा'), L('Story + Platformer', 'कथा + प्लेटफ़ॉर्मर')],
