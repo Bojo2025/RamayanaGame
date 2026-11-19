@@ -61,6 +61,10 @@
     clean: ['Clean sequence!', 'साफ़ क्रम!'], again: ['Again: light feet!', 'फिर से: हल्के पैर!'], woof: ['Woof! Back you go', 'भौं! वापस जाओ'], splash: ['Splash! Back to the lamp', 'छपाक! दीये तक वापस'],
     oof: ['Oof!', 'उफ़!'], boarBeaten: ['The boar is beaten!', 'सूअर हार गया!'], pulled: ['Pulled up!', 'ऊपर खींचा!'], standard: ['War-standard', 'युद्ध-ध्वज'], lotusFound: ['Hidden lotus!', 'छिपा कमल!'],
     hold: ['HOLD', 'दबाओ'], tap: ['TAP', 'टैप'], beat: ['On the beat!', 'थाप पर!'], offBeat: ['Off the beat', 'थाप से चूके'], weak: ['Draw fully first', 'पहले पूरा खींचो'],
+    jumpBtn: ['JUMP', 'कूदो'], blockBtn: ['BLOCK', 'रोको'], special: ['SPECIAL ×3', 'विशेष ×3'],
+    ramaName: ['Rama', 'राम'], lakName: ['Lakshmana', 'लक्ष्मण'],
+    objMother: ['Mother', 'माता'], objFather: ['Father', 'पिता'], objPosts: ['Three posts', 'तीन खंभे'],
+    objJanaka: ['Janaka', 'जनक'], objSita: ['Sita', 'सीता'], objShurpa: ['Shurpanakha', 'शूर्पणखा'], objGuest: ['The guest', 'अतिथि'],
     bird: ['The bird!', 'पक्षी!'], ignore: ['Ignore the shout!', 'शोर अनसुना करो!'], markReset: ['Out of arrows: the mark resets', 'बाण समाप्त: निशान फिर से'], best: ['Best', 'सर्वश्रेष्ठ'],
     continued: ['To be continued', 'आगे की कथा'], moreChapters: ['More chapters are being painted', 'आगे के अध्याय चित्रित हो रहे हैं'],
     soonBody: ['The vow is made. The road south is open, and it is not a short one.', 'प्रतिज्ञा हो चुकी है। दक्षिण का मार्ग खुला है, और वह छोटा नहीं है।'],
@@ -79,6 +83,11 @@
     againSoft: ['The bow waits. Again.', 'धनुष रुकता है। फिर से।']
   };
   function T(k) { var s = STR[k]; return s ? (SAVE.lang === 'hi' ? s[1] : s[0]) : k; }
+  function whoName(id) { return (id === 'lak' || id === 'lakA') ? T('lakName') : T('ramaName'); }
+  function objName(k) {
+    var map = { mother: 'objMother', father: 'objFather', seq: 'objPosts', janaka: 'objJanaka', sita: 'objSita', shurpa: 'objShurpa', guest: 'objGuest' };
+    return map[k] ? T(map[k]) : k;
+  }
   function tr(o) { return o ? (SAVE.lang === 'hi' ? (o.hi || o.en) : o.en) : ''; }
 
   // ---------------- resize / rotate ----------------
@@ -473,7 +482,7 @@
     if (this.done) { lastDlgBox = null; return; }
     var ln = this.cur(), who = CAST[ln.who] || CAST.narrator;
     // On a phone the message sits at the top, so the bottom corners stay free for the stick and ENTER.
-    var bw = TOUCH ? W - 64 : W - 52, bh = 128, bx = TOUCH ? 32 : 26, by = TOUCH ? 96 : H - bh - 14;
+    var edge = TOUCH ? 72 : 28, bw = W - edge * 2, bh = 128, bx = edge, by = TOUCH ? 96 : H - bh - 14;
     lastDlgBox = { x: bx, y: by, w: bw, h: bh };
     ART.panel(g, bx, by, bw, bh, { r: 18 });
     var tx = bx + 26;
@@ -487,7 +496,7 @@
       }
     }
     ART.text(g, tr(who.name), tx, by + 32, { size: 19, gold: true, sw: 3 });
-    var lines = ART.wrap(g, this.text().slice(0, Math.floor(this.ch)), bw - (tx - bx) - 30, SAVE.lang === 'hi' ? 22 : 21);
+    var lines = ART.wrap(g, this.text().slice(0, Math.floor(this.ch)), Math.max(80, bw - (tx - bx) - 40), SAVE.lang === 'hi' ? 22 : 21);
     for (var i = 0; i < lines.length && i < 3; i++) ART.text(g, lines[i], tx, by + 62 + i * 27, { size: SAVE.lang === 'hi' ? 22 : 21, col: ln.who === 'narrator' ? '#f6e6c4' : '#fff8ea', sw: 3 });
     if (this.full() && !TOUCH) {
       var a = 0.55 + 0.45 * Math.sin(G.t * 5);
@@ -599,7 +608,7 @@
       if (msg) pop(h.x, h.y - 160, msg, '#ff9a7a', 20);
       if (G.pips <= 0) { if (DEMO) G.pips = 1; else M.fail = T('outOfPips'); }
     }
-    function addMeter(v) { G.meter = Math.min(100, G.meter + v); if (G.meter >= 100 && !M.meterPop) { M.meterPop = true; pop(active().x, GY - 190, 'SPECIAL ×3', '#ffe27a', 24); AU.sfx('good'); } if (G.meter < 100) M.meterPop = false; }
+    function addMeter(v) { G.meter = Math.min(100, G.meter + v); if (G.meter >= 100 && !M.meterPop) { M.meterPop = true; pop(active().x, GY - 190, T('special'), '#ffe27a', 24); AU.sfx('good'); } if (G.meter < 100) M.meterPop = false; }
     function hitTarget(t, dmg, who, perfectOK) {
       if (t.dead) return;
       t.hp -= dmg; t.flash = 0.2; G.score += 50;
@@ -640,7 +649,7 @@
     M.tap = function (x, y) {
       if (dlg && !dlg.done) { if (TOUCH) { press('confirm'); return 'confirm'; } dlg.advance(); return true; }
       if (M.endDlg && !M.endDlg.done) { if (TOUCH) { press('confirm'); return 'confirm'; } M.endDlg.advance(); return true; }
-      var n = talkable(); if (n) { var sx = n.x - G.cam; if (Math.abs(x - sx) < 110 && y > GY - 260 && y < GY + 20) { openTalk(n); return true; } }
+      var n = talkable(); if (n) { var sx = n.x - G.cam, sy = G.camY || 0; if (Math.abs(x - sx) < 110 && y > GY + sy - 260 && y < GY + sy + 20) { openTalk(n); return true; } }
       return false;
     };
     M.drillFail = function (msg) { if (DEMO && seg.drill) { G.stats.drillRetries++; M.restart = true; return; } M.restart = true; G.stats.drillRetries++; banner(msg || T('drillFail'), tr(seg.drillName), 1.8); };
@@ -649,7 +658,7 @@
       if (dlg) { dlg.update(dt); if (consumeAdvance()) dlg.advance(); return; }
       if (M.endDlg) { M.endDlg.update(dt); if (consumeAdvance()) M.endDlg.advance(); if (M.doneT != null) { M.doneT -= dt; if (M.doneT <= 0) M.done = true; } return; }
       // tag (L8)
-      if (party.length > 1 && IN.tagP()) { ai = 1 - ai; AU.sfx('click'); pop(active().x, active().y - 170, active().id === 'rama' ? 'Rama' : 'Lakshmana', '#fff2c0', 20); ART.spawn('ring', active().x, active().y - 60, { r: 12, life: 0.4, col: 'rgba(255,240,180,0.9)', speed: 0 }); }
+      if (party.length > 1 && IN.tagP()) { ai = 1 - ai; AU.sfx('click'); pop(active().x, active().y - 170, whoName(active().id), '#fff2c0', 20); ART.spawn('ring', active().x, active().y - 60, { r: 12, life: 0.4, col: 'rgba(255,240,180,0.9)', speed: 0 }); }
       var h = active();
       // timers
       if (seg.timeLimit) { timeLeft -= dt; if (timeLeft <= 0) { M.drillFail(); return; } }
@@ -748,6 +757,9 @@
       if (M.doneT != null) { M.doneT -= dt; if (M.doneT <= 0) M.done = true; }
       // camera
       var tx = clamp(h.x - W * 0.4, 0, Math.max(0, len - W)); G.cam += (tx - G.cam) * Math.min(1, dt * 6);
+      var highest = h.y; for (var hi = 0; hi < party.length; hi++) if (party[hi].y < highest) highest = party[hi].y;
+      var wantY = Math.max(0, 86 - (highest - 150));
+      G.camY = (G.camY || 0) + (wantY - (G.camY || 0)) * Math.min(1, dt * 8);
       AU.setIntensity(0.3 + (foes.some(function (f) { return !f.dead && Math.abs(f.x - h.x) < 600; }) ? 0.6 : 0) + (boar && !boar.dead && Math.abs(boar.x - h.x) < 700 ? 0.6 : 0));
     };
     M.updateEndDlg = function (dt) { if (M.endDlg) { M.endDlg.update(dt); if (consumeAdvance()) M.endDlg.advance(); } };
@@ -917,7 +929,9 @@
       return { x: len };
     }
     M.draw = function () {
-      var cam = G.cam;
+      var cam = G.cam, lift = G.camY || 0;
+      if (lift > 0.5) { var hz = th.haze || [140, 170, 200]; g.fillStyle = 'rgb(' + hz[0] + ',' + hz[1] + ',' + hz[2] + ')'; g.fillRect(0, 0, W, H); }
+      g.save(); g.translate(0, lift);
       drawBackdrop(th, cam, { par: seg.bgPar, yoff: seg.bgY, zoom: seg.bgZoom, noMid: seg.noMid, hazeA: seg.hazeA });
       // goal behind world
       drawGoal(seg.goal, cam, goalNeeds());
@@ -949,17 +963,22 @@
       if (seg.fgPillar) { var fx = seg.fgPillar.x - cam, near = Math.abs(active().x - seg.fgPillar.x) < 120; SPR.draw(g, 'terr', 'pillarPalace', fx, GY + 10, { s: 0.98, cx: true, alpha: near ? 0.35 : 1 }); }
       ART.drawParts(g, cam, false);
       drawForeground(th, cam);
+      g.restore();
       drawGrade(th);
       if (dlg) dlg.draw(g); if (M.endDlg) M.endDlg.draw(g);
     };
     M.hud = function () {
-      var x = 260;
+      var x = 270;
       if (seg.timeLimit) { ART.text(g, '⏳ ' + Math.max(0, Math.ceil(timeLeft)) + 's', W / 2, 92, { size: 26, align: 'center', col: timeLeft < 10 ? '#ff9a7a' : '#fff2c0' }); }
       if (seg.arrows) ART.text(g, T('arrows') + ': ' + arrowsLeft, W / 2, seg.timeLimit ? 120 : 92, { size: 20, align: 'center' });
-      if (targets.length) { var left = targets.filter(function (t) { return !t.dead; }).length; ART.text(g, '◎ ' + (targets.length - left) + '/' + targets.length, x, 74, { size: 18 }); x += 90; }
+      if (targets.length) { var left = targets.filter(function (t) { return !t.dead; }).length; ART.text(g, '◎ ' + (targets.length - left) + '/' + targets.length, 22, 108, { size: 16, sw: 3 }); x = 120; }
       if (seg.drillName) ART.text(g, tr(seg.drillName), W / 2, 66, { size: 18, align: 'center', gold: true });
       if (boar && !boar.dead && Math.abs(boar.x - active().x) < 900) { ART.bar(g, W / 2 - 150, 100, 300, 16, boar.hp / boar.max, '#c8582a'); ART.text(g, SAVE.lang === 'hi' ? 'घास का सूअर' : 'Straw Boar', W / 2, 96, { size: 15, align: 'center' }); }
-      if (party.length > 1) ART.text(g, (active().id === 'rama' ? '➶ Rama' : '⚔ Lakshmana') + '   ⇄ Q', 20, 100, { size: 16, col: '#fff2c0' });
+      if (party.length > 1) ART.text(g, (active().id === 'rama' ? '➶ ' : '⚔ ') + whoName(active().id) + '   ⇄', x, 108, { size: 15, col: '#fff2c0', sw: 3 });
+      if (seg.goal && seg.goal.need && !(dlg && !dlg.done) && !(M.endDlg && !M.endDlg.done)) {
+        var bits = seg.goal.need.map(function (k) { return (flags[k] ? '✓ ' : '○ ') + objName(k); });
+        ART.text(g, bits.join('    '), W / 2, 108, { size: 15, align: 'center', col: '#fff6e0', sw: 3 });
+      }
     };
     M.restartSeg = function () { return PlatformMode(seg, L); };
     M.isTalking = function () { return !!((dlg && !dlg.done) || (M.endDlg && !M.endDlg.done)); };
@@ -2241,20 +2260,35 @@
     return StoryMode({ cast: [], lines: [{ who: 'narrator', en: '...', hi: '...' }], theme: seg.theme });
   }
   function freshStats() { return { hits: 0, falls: 0, standards: 0, lotus: 0, perfect: 0, sparHits: 0, smash: 0, drillRetries: 0, wild: 0, trueShots: 0, breaks: 0, minSteady: 100, together: 0, bumps: 0, altarMin: 100, warning: 0, crowns: 0, phaseMisses: 0, boons: 0, accept: 0 }; }
+  function cloneStats(s) { var o = freshStats(); if (s) for (var k in s) o[k] = s[k]; return o; }
+  function clearMarks(seg) {
+    function wipe(lines) { (lines || []).forEach(function (ln) { if (ln) { ln._st = 0; ln._fx = 0; } }); }
+    if (!seg) return;
+    wipe(seg.lines); wipe(seg.goal && seg.goal.line);
+    (seg.npcs || []).forEach(function (n) { wipe(n.lines); });
+  }
   function startLevel(li, si) {
     G.li = li; G.L = LEVELS[li]; G.pips = 3; G.meter = 0; G.score = 0; G.stats = freshStats();
     G.day = G.L.dayTime || 0; G.focusLives = G.L.focusLives || 0; G.levelT = 0; G.segLog = [];
+    G.camY = 0;
     startSeg(si || 0);
   }
   function startSeg(i) {
     stickReset();
     G.si = i; var seg = G.L.segs[i]; if (!seg.theme) seg.theme = G.L.theme;
-    ART.clearParts(); FX.pops.length = 0; G.tip = null; G.tipT = 0; G.segPips = G.pips; G.segT = 0;
+    ART.clearParts(); FX.pops.length = 0; G.tip = null; G.tipT = 0; G.segPips = G.pips; G.segT = 0; G.camY = 0;
     G.mode = makeMode(seg); G.segName = seg.type;
     var mus = seg.type === 'story' ? 'calm' : (seg.music || 'play');
     AU.setMusic(mus, { raga: G.L.music.raga, lead: G.L.music.lead, intensity: 0.4 });
     AU.setAmbience(theme(seg.theme).amb);
     FX.fade = 1;
+    G.segScore = G.score; G.segStats = cloneStats(G.stats); G.segMeter = G.meter;
+  }
+  // Try Again and Restart this part replay only the current section, from the score and stats it began with.
+  function retrySection() {
+    if (G.segStats) { G.score = G.segScore; G.stats = cloneStats(G.segStats); G.meter = G.segMeter || 0; }
+    clearMarks(G.L && G.L.segs[G.si]);
+    startSeg(G.si);
   }
   function nextSeg() {
     G.segLog.push({ si: G.si, type: G.L.segs[G.si].type, t: Math.round(G.segT * 10) / 10 });
@@ -2319,14 +2353,14 @@
   function touchLayout() {
     var m = G.mode, t = m && m.touch, L = [];
     if (!TOUCH || !t || t === 'story' || showEnter()) return L;
-    if (t === 'runner') return [{ zone: 'left', act: 'jump', label: T('hold') === 'HOLD' ? 'JUMP' : 'कूदो' }, { zone: 'right', act: 'atk', label: G.mode && G.L.segs[G.si].jumpOnly ? '' : '⚔' }];
+    if (t === 'runner') return [{ zone: 'left', act: 'jump', label: T('jumpBtn') }, { zone: 'right', act: 'atk', label: G.mode && G.L.segs[G.si].jumpOnly ? '' : '⚔' }];
     if (t === 'hold') return [{ zone: 'left', act: 'hold', label: T('hold') }, { zone: 'right', act: 'tap', label: T('tap') }];
     if (t === 'flyer') return [{ zone: 'left', act: 'hold', label: SAVE.lang === 'hi' ? 'पंख' : 'FLAP' }, { zone: 'right', act: 'tap', label: SAVE.lang === 'hi' ? 'चोंच' : 'STRIKE' }];
-    L.push({ x: W - 100, y: H - 108, r: 58, act: 'jump', label: 'JUMP' });
+    L.push({ x: W - 100, y: H - 108, r: 58, act: 'jump', label: T('jumpBtn') });
     var hero = G.mode.hero && G.mode.hero.A;
     if (t === 'noatk') L.push({ x: W - 228, y: H - 78, r: 46, act: 'confirm', label: '💬' });
     else L.push({ x: W - 230, y: H - 76, r: 48, act: 'atk', label: hero && !hero.melee ? '➶' : '⚔' });
-    if (t === 'arena') L.push({ x: W - 348, y: H - 74, r: 42, act: 'block', label: 'BLOCK' });
+    if (t === 'arena') L.push({ x: W - 348, y: H - 74, r: 42, act: 'block', label: T('blockBtn') });
     if (t === 'duo') L.push({ x: W - 224, y: H - 196, r: 36, act: 'tag', label: '⇄' });
     return L;
   }
@@ -2346,11 +2380,18 @@
     layoutHud();
     var L = G.L, ss = Math.min(1, W / 900);
     // left: level plaque + pips + meter
-    ART.panel(g, 10, 10, 250, 58, { r: 14, plain: true, c0: 'rgba(30,12,6,0.62)', c1: 'rgba(20,8,4,0.7)' });
-    ART.text(g, (SAVE.lang === 'hi' ? 'स्तर ' : 'Level ') + L.n + ' · ' + tr(L.title), 22, 32, { size: 14, gold: true, sw: 3 });
-    for (var i = 0; i < G.maxPips; i++) if (i < Math.max(G.pips, 3)) ART.pip(g, 30 + i * 26, 50, 11, i < G.pips);
+    var title = (SAVE.lang === 'hi' ? 'स्तर ' : 'Level ') + L.n + ' · ' + tr(L.title);
+    g.font = ART.font(13);
+    var titleMax = Math.max(200, Math.min(W - 310, 460));
+    var tlines = ART.wrap(g, title, titleMax - 22, 13).slice(0, 2);
+    var tw = 0; tlines.forEach(function (l) { tw = Math.max(tw, g.measureText(l).width); });
+    var pw = Math.max(200, Math.min(titleMax, tw + 26)), ph = 28 + tlines.length * 16 + 22;
+    ART.panel(g, 10, 8, pw, ph, { r: 14, plain: true, c0: 'rgba(30,12,6,0.62)', c1: 'rgba(20,8,4,0.7)' });
+    tlines.forEach(function (l, i) { ART.text(g, l, 22, 26 + i * 16, { size: 13, gold: true, sw: 3 }); });
+    var pipY = 8 + ph - 16;
+    for (var i = 0; i < G.maxPips; i++) if (i < Math.max(G.pips, 3)) ART.pip(g, 28 + i * 24, pipY, 10, i < G.pips);
     var m = G.mode, showMeter = m && (m.kind === 'platform' || m.kind === 'runner' || m.kind === 'arena') && !(G.L.segs[G.si].noAttack || G.L.segs[G.si].jumpOnly);
-    if (showMeter) { ART.bar(g, 112, 44, 136, 12, G.meter / 100, G.meter >= 100 ? '#fff07a' : '#f0a030'); if (G.meter >= 100) ART.glow(g, 180, 50, 50, 'rgba(255,230,140,0.4)'); }
+    if (showMeter) { var mx = 28 + 3 * 24 + 8; ART.bar(g, mx, pipY - 6, Math.max(70, pw - mx - 8), 11, G.meter / 100, G.meter >= 100 ? '#fff07a' : '#f0a030'); if (G.meter >= 100) ART.glow(g, mx + 40, pipY, 36, 'rgba(255,230,140,0.4)'); }
     // right: score + buttons
     ART.text(g, T('score') + ' ' + Math.round(G.score), W - 130, 44, { size: 20, align: 'right', gold: true });
     ART.panel(g, HUDB.sound.x, HUDB.sound.y, 46, 46, { r: 23, plain: true }); ART.iconSound(g, HUDB.sound.x + 23, HUDB.sound.y + 23, 22, !AU.isMuted());
@@ -2370,6 +2411,9 @@
   function drawPops(cam) {
     FX.pops.forEach(function (p, i) {
       var k = p.t / 1.1, x = p.screen ? p.x : p.x - cam, y = p.y - k * 50;
+      if (!p.screen) y += G.camY || 0;
+      var half = Math.min(120, (p.txt ? p.txt.length : 4) * (p.size || 24) * 0.32);
+      x = Math.max(half + 10, Math.min(W - half - 10, x));
       if (TOUCH && (y > H - 210)) { x = Math.min(p.screen ? x : x, W * 0.42); y = 248 + (i % 2) * 22 - k * 28; }
       if (TOUCH && x > W - 390 && y > H - 230) x = W * 0.4;
       g.globalAlpha = Math.max(0, 1 - k * k); ART.text(g, p.txt, x, y, { size: p.size * (1 + Math.max(0, 0.25 - p.t) * 1.2), align: 'center', col: p.col, sw: 4, bold: true });
@@ -2454,7 +2498,7 @@
     update: function () { if (IN.confirmP()) setScene(SC.title); },
     down: function (p) { if (inB(this.btn, p.x, p.y)) { AU.sfx('click'); setScene(SC.title); } },
     draw: function () {
-      titleBg(G.t, 'bg2'); ART.panel(g, 40, 30, W - 80, H - 120, { r: 20 });
+      titleBg(G.t, 'bg2'); ART.panel(g, 40, 22, W - 80, H - 118, { r: 20 });
       ART.text(g, T('howto'), W / 2, 72, { size: 30, align: 'center', kind: 'title', gold: true, bold: true });
       var hi = SAVE.lang === 'hi', c1 = 80, c2 = W / 2 + 10, y = 110;
       var kb = hi ? [['चलना', '← → / A D'], ['कूदना (दबाए = ऊँचा, दोबारा = दोहरी)', 'Space / ↑ / W'], ['फिसलना / झुकना', '↓ / S'], ['वार / बाण (2 टैप भारी, 3 = विशेष)', 'J / K / X'], ['रोकना (अखाड़ा)', 'Shift / L'], ['भाई बदलो (स्तर 8)', 'Q / Tab / E'], ['बात / आगे', 'Enter'], ['विराम · ध्वनि', 'P / Esc · M']]
@@ -2464,7 +2508,7 @@
       ART.text(g, hi ? 'कीबोर्ड' : 'Keyboard', c1, y, { size: 19, gold: true }); ART.text(g, hi ? 'स्पर्श (मोबाइल, आड़ा)' : 'Touch (phone, landscape)', c2, y, { size: 19, gold: true });
       kb.forEach(function (r, i) { ART.text(g, r[0], c1, y + 30 + i * 30, { size: 15 }); ART.text(g, r[1], c2 - 30, y + 30 + i * 30, { size: 15, align: 'right', col: '#ffd27a' }); });
       tc.forEach(function (r, i) { var ls = ART.wrap(g, '• ' + r, W - c2 - 70, 15); ls.forEach(function (l, k) { ART.text(g, l, c2, y + 30 + i * 46 + k * 19, { size: 15 }); }); });
-      ART.text(g, hi ? 'कमल-पंखुड़ियाँ = जीवन। साफ़ वार से विशेष-मीटर भरता है।' : 'Lotus petals = your strength. Clean hits fill the special meter.', W / 2, H - 92, { size: 15, align: 'center', col: '#ffe9c0' });
+      ART.text(g, hi ? 'कमल-पंखुड़ियाँ = जीवन। साफ़ वार से विशेष-मीटर भरता है।' : 'Lotus petals = your strength. Clean hits fill the special meter.', W / 2, H - 124, { size: 15, align: 'center', col: '#ffe9c0' });
       ART.button(g, this.btn);
     }
   };
@@ -2542,22 +2586,22 @@
       ART.drawParts(g, 0, true);
       ART.text(g, 'RAMAYANA', W / 2, 78, { size: 36, align: 'center', kind: 'title', gold: true, bold: true, sw: 5 });
       ART.text(g, T('subtitle'), W / 2, 112, { size: 16, align: 'center', col: '#ffe9c4' });
-      ART.text(g, T('theEnd'), W / 2, 156, { size: 22, align: 'center', gold: true });
-      var body = ART.wrap(g, T('soonBody'), Math.min(620, W - 140), 16);
-      body.forEach(function (l, i) { ART.text(g, l, W / 2, 188 + i * 22, { size: 16, align: 'center', col: '#fff4e0' }); });
+      ART.text(g, T('theEnd'), W * 0.34, 156, { size: 22, align: 'center', gold: true });
+      var body = ART.wrap(g, T('soonBody'), Math.min(440, W * 0.46), 16);
+      body.forEach(function (l, i) { ART.text(g, l, W * 0.34, 188 + i * 22, { size: 16, align: 'center', col: '#fff4e0' }); });
       if (t > 2.2) {
-        var k = Math.min(1, (t - 2.2) * 1.2);
+        var k = Math.min(1, (t - 2.2) * 1.2), hx = W - 130;
         g.save(); g.globalAlpha = k;
-        ART.glow(g, W * 0.8, H * 0.62, 120, 'rgba(255,190,80,0.35)');
-        SPR.draw(g, 'puppet_hanuman', t > 5 ? 'lookOut' : 'stand', W * 0.84, H - 100, { s: 0.72, face: -1 });
-        var hl = ART.wrap(g, T('heard'), 240, 15);
-        hl.forEach(function (l, i) { ART.text(g, l, W * 0.84, H * 0.38 + i * 20, { size: 15, align: 'center', col: '#fff6e0', sw: 3 }); });
+        ART.glow(g, hx, H - 180, 90, 'rgba(255,190,80,0.35)');
+        SPR.draw(g, 'puppet_hanuman', t > 5 ? 'lookOut' : 'stand', hx, H - 96, { s: 0.62, face: -1 });
+        var hl = ART.wrap(g, T('heard'), 200, 14);
+        hl.forEach(function (l, i) { ART.text(g, l, hx, H - 250 + i * 18, { size: 14, align: 'center', col: '#fff6e0', sw: 3 }); });
         g.restore();
       }
       if (t > 4.2) {
         g.save(); g.globalAlpha = Math.min(1, (t - 4.2));
-        ART.text(g, SAVE.lang === 'hi' ? 'वाल्मीकि रामायण के बाद एक कथा' : 'A telling after the Valmiki Ramayana', 36, 268, { size: 15, col: '#ffe0b8' });
-        ART.text(g, T('credit'), 36, 300, { size: 18, gold: true, sw: 3 });
+        ART.text(g, SAVE.lang === 'hi' ? 'वाल्मीकि रामायण के बाद एक कथा' : 'A telling after the Valmiki Ramayana', 40, H - 128, { size: 15, col: '#ffe0b8' });
+        ART.text(g, T('credit'), 40, H - 104, { size: 16, gold: true, sw: 3 });
         g.restore();
       }
       ART.button(g, this.btn);
@@ -2585,9 +2629,10 @@
       var gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, 'rgba(15,6,2,0.88)'); gr.addColorStop(0.62, 'rgba(15,6,2,0.55)'); gr.addColorStop(1, 'rgba(15,6,2,0.1)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
       var k = Math.min(1, t * 2);
       ART.glow(g, W * 0.8, H * 0.62, 240, 'rgba(255,190,100,0.35)');
-      g.save(); g.globalAlpha = k; drawLook(L.hero, W * 0.8 + (1 - k) * 80, H - 10, L.hero === 'ascetic' || L.hero === 'boon' ? 1.05 : 1.2, -1, false); g.restore();
-      if (L.n === 8) SPR.draw(g, 'lak', 'idle', W * 0.66 + (1 - k) * 80, H - 10, { s: 1.4, face: 1, alpha: k * 0.95 });
-      if (L.n === 13) drawLook('lakA', W * 0.64 + (1 - k) * 60, H - 10, 1.05, 1, false);
+      var hx = this.btn.x - 145;
+      g.save(); g.globalAlpha = k; drawLook(L.hero, hx + (1 - k) * 40, H - 8, L.hero === 'ascetic' || L.hero === 'boon' ? 0.92 : 1.05, -1, false); g.restore();
+      if (L.n === 8) SPR.draw(g, 'lak', 'idle', hx - 120 + (1 - k) * 40, H - 8, { s: 1.15, face: 1, alpha: k * 0.95 });
+      if (L.n === 13) drawLook('lakA', hx - 110 + (1 - k) * 40, H - 8, 0.95, 1, false);
       var x = 50, y = 70;
       ART.text(g, (SAVE.lang === 'hi' ? 'स्तर ' : 'Level ') + L.n + '  ·  ' + tr(L.mode), x, y, { size: 18, col: '#ffd8a0' });
       var tl = ART.wrap(g, tr(L.title), W * 0.55, 36, 'title'); tl.forEach(function (l, i) { ART.text(g, l, x, y + 44 + i * 42, { size: 36, kind: 'title', gold: true, bold: true, sw: 6 }); });
@@ -2615,7 +2660,7 @@
       else if (seg.type === 'archery') ART.weather('leaves', dt, W, H, -200 * (seg.wind || 0));
       else if (seg.type === 'meditate') ART.weather(seg.storm ? 'rain' : 'stars', dt, W, H, seg.storm ? 40 : 0);
       if (m.fail) { G.failMsg = m.fail; AU.sfx('over'); AU.setMusic('off'); setScene(SC.over); return; }
-      if (m.restart) { var nm = m.restartSeg ? m.restartSeg() : makeMode(seg); ART.clearParts(); G.mode = nm; G.pips = Math.max(G.pips, 1); return; }
+      if (m.restart) { retrySection(); return; }
       if (m.done) nextSeg();
     },
     key: function (a) { if (a === 'pause') setScene(SC.pause); if (a === 'mute') { AU.setMuted(!AU.isMuted()); SAVE.mute = AU.isMuted(); persist(); } },
@@ -2661,7 +2706,7 @@
     down: function (p) {
       var b = menuBtnHit(this.btns, p.x, p.y); if (!b) return; AU.sfx('click');
       if (b.id === 'res') setScene(SC.play);
-      else if (b.id === 'rst') { G.pips = Math.max(3, G.segPips || 3); startSeg(G.si); setScene(SC.play); }
+      else if (b.id === 'rst') { G.pips = Math.max(3, G.segPips || 3); retrySection(); setScene(SC.play); }
       else if (b.id === 'sel') { AU.setMusic('off'); setScene(SC.select); }
       else if (b.id === 'snd') { AU.setMuted(!AU.isMuted()); SAVE.mute = AU.isMuted(); persist(); this.lay(); }
       else if (b.id === 'lang') { SAVE.lang = SAVE.lang === 'hi' ? 'en' : 'hi'; persist(); this.lay(); }
@@ -2677,7 +2722,7 @@
   SC.over = { name: 'over',
     enter: function () { this.t = 0; this.btns = [{ id: 'retry', x: W / 2 - 220, y: 330, w: 210, h: 50, label: T('retry'), primary: true }, { id: 'sel', x: W / 2 + 10, y: 330, w: 210, h: 50, label: T('levels') }]; },
     update: function (dt) { this.t += dt; if (IN.confirmP()) this.go('retry'); },
-    go: function (id) { AU.sfx('click'); if (id === 'retry') { G.pips = 3; G.meter = 0; if (G.L.focusLives && G.focusLives <= 0) G.focusLives = G.L.focusLives; if (G.L.dayTime && G.day <= 0) G.day = G.L.dayTime * 0.6; if (G.L.n === 7) G.stats.breaks = 0; startSeg(G.si); setScene(SC.play); } else setScene(SC.select); },
+    go: function (id) { AU.sfx('click'); if (id === 'retry') { G.pips = 3; if (G.L.focusLives && G.focusLives <= 0) G.focusLives = G.L.focusLives; if (G.L.dayTime && G.day <= 0) G.day = G.L.dayTime * 0.6; retrySection(); setScene(SC.play); } else setScene(SC.select); },
     down: function (p) { var b = menuBtnHit(this.btns, p.x, p.y); if (b) this.go(b.id); },
     draw: function () {
       if (G.mode) G.mode.draw(); g.fillStyle = 'rgba(20,4,0,' + Math.min(0.7, this.t * 2) + ')'; g.fillRect(0, 0, W, H);
@@ -2769,7 +2814,9 @@
     resetSave: function () { SAVE.unlocked = 1; SAVE.best = {}; persist(); },
     measure: function (names) { return AU.measureSfx(names); },
     render: render,
-    freeze: function (v) { MANUAL = !!v; }
+    freeze: function (v) { MANUAL = !!v; },
+    forceFail: function () { if (G.mode) G.mode.fail = 'test'; },
+    liftHero: function (dy) { var m = G.mode; if (!m) return; var list = m.party || (m.hero ? [m.hero] : []); list.forEach(function (h) { if (h && h.y != null) { h.y -= dy; h.vy = 0; h.gr = false; } }); }
   };
   resize();
   ART.load(function () {

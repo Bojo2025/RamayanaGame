@@ -83,9 +83,9 @@
           ['rama', 'Mother, the peacocks run faster than me. I am only practising.', 'माँ, मोर मुझसे तेज़ दौड़ते हैं। मैं तो बस अभ्यास कर रहा हूँ।'],
           ['kaushalya', 'Practise, then. But be gentle with all that is smaller than you. That is the first strength of a king.', 'तो अभ्यास करो। पर जो तुमसे छोटा है, उसके साथ कोमल रहो। यही राजा का पहला बल है।']]) },
           { id: 'dasharatha', x: 4620, face: -1, key: 'father', lines: D([
-          ['dasharatha', 'My son. The bow-yard gate is open for you today.', 'मेरे पुत्र। आज धनुर्शाला का द्वार तुम्हारे लिए खुला है।'],
+          ['dasharatha', 'My son. The bow-yard gate opens when three things are done: greet your mother, speak with me, and hop all three posts without touching the ground.', 'मेरे पुत्र। धनुर्शाला का द्वार तब खुलता है जब तीन काम पूरे हों: माता का अभिवादन, मुझसे बात, और तीनों खंभों पर बिना ज़मीन छुए कूदना।'],
           ['rama', 'Father, will you watch me?', 'पिताजी, क्या आप मुझे देखेंगे?'],
-          ['dasharatha', "Always. A father's eyes follow his son further than any arrow flies.", 'सदा। पिता की आँखें पुत्र का पीछा किसी भी बाण से दूर तक करती हैं।'],
+          ['dasharatha', 'Always. The marks above show what is still left. A father\'s eyes follow his son further than any arrow flies.', 'सदा। ऊपर के चिह्न बताते हैं कि क्या शेष है। पिता की आँखें पुत्र का पीछा किसी भी बाण से दूर तक करती हैं।'],
           ['rama', 'Then I will make every arrow true.', 'तो मैं हर बाण को सच्चा बनाऊँगा।']]) }],
         seq: { posts: 3, x0: 1900, x1: 2420 },
         decor: [{ k: 'peacock', x: 260, s: 0.6, sh: 'terr' }, { k: 'pillarPalace', x: 1420, s: 0.75, sh: 'terr' }, { k: 'pot', x: 2560, s: 0.45 }, { k: 'peacock', x: 3700, s: 0.55, sh: 'terr', face: -1 }, { k: 'pot', x: 4480, s: 0.4 }],
