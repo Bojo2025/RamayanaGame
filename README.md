@@ -55,8 +55,14 @@ Every asset is embedded in `js/assets.js`, so the game also runs from `file://`.
 22. Forest Demon Encounters: three fixed-screen bouts in the clearing.
 23. Shurpanakha Approaches: she proposes, she is refused, and the visit turns into a path.
 24. Shurpanakha's Attack: play as Lakshmana. She flees, wounded in her pride, toward Khara and Ravana. The bout is not a killing.
+25. The Golden Deer: chase the gold, loose the arrow, and hear a voice that sits wrong.
+26. Lakshmana Drawn Away: Sita sends him. He draws the line later tellings remember, and he goes.
+27. Ravana's Approach and the Line: play as Sita. A guest asks for alms. Crossing the line is the chapter, and it is a loss you still complete.
+28. The Abduction: the Pushpaka lifts. Run beneath it and gather the ornaments Sita throws.
+29. Jatayu's Air Battle: the only flight. Flap, strike the vimana, and the level ends when the wing gives.
+30. Aftermath and the Vow: the empty hut, Jatayu's direction and his fire, Rama's vow. The credits follow, with Hanuman hearing it from the south.
 
-After level 24 the game shows a "to be continued" card. Levels 25–30 stay listed in the chronicle (`js/levels2.js`). Painted art for 9–24 loads from `js/assets2.js` after the opening eight, so levels 1–8 still start on the original file.
+Clearing level 30 opens the credits, not a "to be continued" card. All thirty chapters are in the chronicle once unlocked. Art for 9–24 loads from `js/assets2.js`. Art for 25–30 loads from `js/assets3.js` just after, so the opening eight still start on the original file.
 
 ## Structure
 ```
@@ -66,8 +72,9 @@ js/audio.js    WebAudio: Indian-classical procedural score (tanpura, tabla, bans
 js/art.js      parallax plates, scenery layers, textured ground, particles, weather, fog, glow, UI widgets
 js/sprites.js  atlas drawing (feet anchors, flip, tint, portraits)
 js/levels.js   levels 1–8 as data (bilingual EN/HI)
-js/levels2.js  playable levels 9–24; titles for 25–30
+js/levels2.js  playable levels 9–30
 js/assets2.js  lazy-loaded plates and sprites for levels 9–24
+js/assets3.js  lazy-loaded plates and sprites for levels 25–30
 js/game.js     loop, input, physics, the six play modes, menus, save, demo autopilot, test hooks
 tools/test_levels_9_14.js  Playwright: autopilot levels 9–14, smoke 1 and 8, screenshots
 ```

@@ -21,7 +21,7 @@ async function boot(browser, level, opts) {
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   const q = 'level=' + level + '&demo=1&capture=1' + (opts.touch ? '&touch=1' : '&touch=0');
   await page.goto(FILE + '?' + q, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction((n) => window.__rpdReady && window.__rpdAssets2 && window.__rpd.state().level === n && window.__rpd.state().scene === 'play', level, { timeout: 30000 });
+  await page.waitForFunction((n) => window.__rpdReady && window.__rpdAssets2 && (n < 25 || window.__rpdAssets3) && window.__rpd.state().level === n && window.__rpd.state().scene === 'play', level, { timeout: 30000 });
   await page.evaluate(() => window.__rpd.freeze(true));
   return { page, errors };
 }
@@ -33,7 +33,7 @@ async function play(page, wallMs) {
   while (Date.now() - t0 < wallMs) {
     st = await page.evaluate(() => window.__rpd.advance(0.5));
     steps++;
-    if (st.scene === 'complete' || st.scene === 'over' || st.scene === 'soon') break;
+    if (st.scene === 'complete' || st.scene === 'over' || st.scene === 'soon' || st.scene === 'credits') break;
     if (steps > 2000) break;
   }
   st.steps = steps;
@@ -65,16 +65,17 @@ async function play(page, wallMs) {
     await page.close();
   }
 
-  for (const n of [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]) {
+  for (const n of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]) {
     const desk = await boot(browser, n, { viewport: desktop, touch: false });
     await desk.page.evaluate(() => window.__rpd.advance(1.2));
     await shot(desk.page, 'L' + n + '_desktop.jpg');
     const st = await play(desk.page, n === 9 ? 90000 : n === 14 ? 90000 : 70000);
     if (st.scene === 'complete') await shot(desk.page, 'L' + n + '_complete.jpg');
     let soon = null;
-    if (n === 24 && st.scene === 'complete') {
-      soon = await desk.page.evaluate(() => { window.__rpd.press('confirm'); return window.__rpd.advance(0.6); });
-      await shot(desk.page, 'L24_to_be_continued.jpg');
+    if (n === 30 && st.scene === 'complete') {
+      soon = await desk.page.evaluate(() => { window.__rpd.press('confirm'); window.__rpd.advance(0.05); return window.__rpd.advance(5.4); });
+      if (!soon || soon.scene !== 'credits') throw new Error('credits did not open: ' + (soon && soon.scene));
+      await shot(desk.page, 'L30_credits.jpg');
     }
     report.push({
       level: n, viewport: 'desktop', scene: st.scene, seg: st.seg, segType: st.segType,

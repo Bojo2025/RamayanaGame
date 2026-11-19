@@ -20,8 +20,9 @@
       Promise.all(fs.map(function (f) { return f.load().then(function (ff) { document.fonts.add(ff); }); })).then(fin, fin);
     } catch (e) { fin(); }
   };
-  R.loadExtra = function (done) {
-    var extra = window.RPD_ASSETS2 || {};
+  R.loadExtra = function (bag, done) {
+    if (typeof bag === 'function') { done = bag; bag = null; }
+    var extra = bag || window.RPD_ASSETS2 || {};
     var keys = Object.keys(extra).filter(function (k) { return typeof extra[k] === 'string' && extra[k].indexOf('data:image') === 0; });
     if (!keys.length) { done && done(); return; }
     var left = keys.length;
@@ -62,7 +63,11 @@
     deepforest: { plate: 'bg20', tex: 'texEarth', top: '#3a4a28', lip: '#243018', lipHi: '#8aaa58', grade: 'rgba(20,40,16,0.12)', haze: [80, 100, 60], weather: 'leaves', mid: ['bamboo', 'fern', 'witheredTree', 'mango'], midSheet: 'scenery_9_30', amb: 'mountain', fg: null, grassCol: '#4a6a30' },
     panch: { plate: 'bg21', tex: 'texGrass', top: '#5a7a32', lip: '#345018', lipHi: '#c4dc78', grade: 'rgba(255,220,150,0.05)', haze: [220, 210, 160], weather: 'leaves', mid: ['bamboo', 'mango', 'fern', 'goldenTree'], midSheet: 'scenery_9_30', amb: 'range', fg: null, grassCol: '#6a9438' },
     panchNight: { plate: 'bg21n', tex: 'texEarth', top: '#2a2418', lip: '#16120c', lipHi: '#6a5840', grade: 'rgba(10,10,30,0.22)', haze: [40, 40, 70], weather: 'stars', mid: ['bamboo', 'witheredTree', 'fern'], midSheet: 'scenery_9_30', amb: 'mountain', fg: null, grassCol: null },
-    demons: { plate: 'bg22', tex: 'texEarth', top: '#4a3020', lip: '#2a1810', lipHi: '#a07048', grade: 'rgba(80,20,10,0.12)', haze: [90, 50, 30], weather: 'leaves', mid: ['witheredTree', 'thornBush', 'fern'], midSheet: 'scenery_9_30', amb: 'mountain', fg: null, grassCol: '#3a4a22' }
+    demons: { plate: 'bg22', tex: 'texEarth', top: '#4a3020', lip: '#2a1810', lipHi: '#a07048', grade: 'rgba(80,20,10,0.12)', haze: [90, 50, 30], weather: 'leaves', mid: ['witheredTree', 'thornBush', 'fern'], midSheet: 'scenery_9_30', amb: 'mountain', fg: null, grassCol: '#3a4a22' },
+    deer: { plate: 'bg25', tex: 'texGrass', top: '#4a6828', lip: '#2c4018', lipHi: '#d8e888', grade: 'rgba(255,210,80,0.08)', haze: [255, 220, 140], weather: 'leaves', mid: ['bamboo', 'mango', 'fern', 'goldenTree'], midSheet: 'scenery_9_30', amb: 'range', fg: null, grassCol: '#6a9430' },
+    abduct: { plate: 'bg28', tex: 'texEarth', top: '#5a3828', lip: '#3a2018', lipHi: '#e0a060', grade: 'rgba(80,20,10,0.16)', haze: [180, 80, 40], weather: 'embers', mid: ['witheredTree', 'thornBush'], midSheet: 'scenery_9_30', amb: 'battle', fg: null, grassCol: null },
+    sky: { plate: 'bg29', tex: 'texRock', top: '#6a4030', lip: '#3a2018', lipHi: '#f0c080', grade: 'rgba(255,120,40,0.08)', haze: [255, 160, 90], weather: null, mid: [], amb: 'peak', fg: null, grassCol: null },
+    after: { plate: 'bg30', tex: 'texEarth', top: '#4a4030', lip: '#2a2418', lipHi: '#c0a070', grade: 'rgba(40,20,10,0.16)', haze: [160, 120, 80], weather: 'dust', mid: ['witheredTree', 'fern'], midSheet: 'scenery_9_30', amb: 'mountain', fg: null, grassCol: '#5a6840' }
   };
 
   // painted plate, mirror-tiled so parallax never shows a seam

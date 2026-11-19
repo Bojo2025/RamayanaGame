@@ -10,6 +10,7 @@
     rama_adult: 1, lak_adult: 1, sita_adult: 1, ravanan: 1, tataka: 1, subahu: 1, rakshasa: 1, lanka_guards: 1, parashurama: 1,
     puppet_janaka: 1, puppet_dasharatha: 1, puppet_kaikeyi: 1, puppet_manthara: 1, puppet_sita_story: 1,
     shurpanakha_arena: 1, shurpanakha_story: 1,
+    golden_deer: 1, jatayu: 1, pushpaka: 1, puppet_ravana_disguised: 1, puppet_hanuman: 1, clouds_sunset: 1,
     puppet_brahma: 1, puppet_vishvamitra: 1, puppet_dashanan_boon: 1, puppet_rama_story: 1, puppet_lak_story: 1,
     props_9_30: 1, scenery_9_30: 1, terrain_9_30: 1, foes_forest: 1,
     npc: { kaikasi: 1, kaushalya: -1, dasharatha: -1, vasishtha: -1 } };
@@ -26,8 +27,9 @@
     });
   };
   // Levels 9–30 art arrives in window.RPD_SPRITES2 after the opening eight have already started.
-  S.loadExtra = function (done) {
-    var extra = window.RPD_SPRITES2 || {}, keys = Object.keys(extra);
+  S.loadExtra = function (bag, done) {
+    if (typeof bag === 'function') { done = bag; bag = null; }
+    var extra = bag || window.RPD_SPRITES2 || {}, keys = Object.keys(extra);
     if (!keys.length) { S.extra = true; done && done(); return; }
     var left = keys.length;
     keys.forEach(function (k) {

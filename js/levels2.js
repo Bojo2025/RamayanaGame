@@ -26,6 +26,9 @@
   CAST.manthara = { sh: 'puppet_manthara', fr: 'stand', name: L('Manthara', 'मंथरा') };
   CAST.para = { sh: 'parashurama', fr: 'ready', name: L('Parashurama', 'परशुराम') };
   CAST.shurpa = { sh: 'shurpanakha_story', fr: 'composed', name: L('Shurpanakha', 'शूर्पणखा') };
+  CAST.maricha = { sh: 'golden_deer', fr: 'maricha', name: L('Maricha', 'मारीच') };
+  CAST.guest = { sh: 'puppet_ravana_disguised', fr: 'bow', name: L('A wandering ascetic', 'एक भ्रमणशील तपस्वी') };
+  CAST.jatayu = { sh: 'jatayu', fr: 't_dying', name: L('Jatayu', 'जटायु') };
   CAST.gate = { sh: 'lanka_guards', fr: 'captain0', name: L('Captain of the gate', 'द्वार का सेनापति') };
 
   var LEVELS = window.RPD_LEVELS;
@@ -577,12 +580,192 @@
     ]
   });
 
-  window.RPD_LATER = [
-    [25, L('The Golden Deer', 'स्वर्ण मृग'), L('Runner', 'दौड़')],
-    [26, L('Lakshmana Drawn Away', 'लक्ष्मण का जाना'), L('Platformer + Story', 'प्लेटफ़ॉर्मर + कथा')],
-    [27, L("Ravana's Approach and the Line", 'रावण का आगमन और रेखा'), L('Story + Platformer', 'कथा + प्लेटफ़ॉर्मर')],
-    [28, L('The Abduction', 'सीता हरण'), L('Runner + Arena', 'दौड़ + अखाड़ा')],
-    [29, L("Jatayu's Air Battle", 'जटायु का आकाश-युद्ध'), L('Air / Flyer', 'आकाश-उड़ान')],
-    [30, L('Aftermath and the Vow', 'परिणाम और प्रतिज्ञा'), L('Story', 'कथा')]
-  ];
+  // ---------------------------------------------------------------- 25
+  LEVELS.push({
+    n: 25, plate: 'bg25', title: L('The Golden Deer', 'स्वर्ण मृग'), hero: 'ramaA', theme: 'deer',
+    mode: L('Runner', 'दौड़'), music: { raga: 'yaman', lead: 'flute' },
+    intro: L('A deer no forest grows. Chase it. When the shot is allowed, loose it. Listen to what the voice does afterwards.', 'एक मृग जो किसी वन में नहीं जन्मता। उसका पीछा करो। जब बाण की अनुमति हो, छोड़ो। उसके बाद स्वर क्या करता है, उसे सुनो।'),
+    stars: [L('Finish the level', 'स्तर पूरा करो'), L('Land the shot on the deer', 'मृग पर बाण लगाओ'), L('Take one hit or fewer', 'एक या कम चोट खाओ')],
+    star2: { stat: 'deer', min: 1 }, star3: { stat: 'hits', max: 1 },
+    segs: [
+      { type: 'story', theme: 'deer', cast: [{ id: 'sitaA', x: 0.28, face: 1, s: 1.02 }, { id: 'ramaA', x: 0.52, face: -1, s: 1.05 }, { id: 'lakA', x: 0.76, face: -1, s: 1.05, fr: 'guard' }],
+        lines: D([
+          ['sitaA', 'Look. Gold, and it moves like a living thing. I have not asked you for a jewel in all these years. I am asking for that deer.', 'देखो। सोना, और यह किसी जीव की तरह चलता है। इन वर्षों में मैंने तुमसे कोई गहना नहीं माँगा। मैं उस मृग को माँग रही हूँ।'],
+          ['lakA', 'Brother. Gold does not graze. This is a trick with legs. Let it go back to whoever sent it.', 'भैया। सोना चरता नहीं। यह टाँगों वाली माया है। इसे उसके पास लौटने दो जिसने भेजा है।'],
+          ['ramaA', 'If it is a deer, I will bring it. If it is not, the forest will show me that too. Stay with her, Lakshmana. I will not be long.', 'यदि यह मृग है, तो मैं इसे लाऊँगा। यदि नहीं, तो वन मुझे वह भी दिखा देगा। उसके साथ रहो, लक्ष्मण। मैं देर नहीं करूँगा।']
+        ]) },
+      { type: 'runner', hero: 'ramaA', theme: 'deer', len: 11000, speed: 400, speedMax: 460, seed: 25, music: 'play', chase: 'deer', deerAt: 2600,
+        cry: L('A cry, in a voice like yours. It sits wrong.', 'एक पुकार, तुम्हारे स्वर जैसी। वह ठीक नहीं बैठती।'),
+        phases: [
+          { until: 4200, set: ['gap', 'branch', 'rock'], name: L('The gold ahead', 'आगे का सोना') },
+          { until: 10400, set: ['branch', 'gap', 'rock'], name: L('Loose the arrow', 'बाण छोड़ो') }
+        ],
+        tips: [{ x: 40, t: L('Keep it in front of you. Slide the branches. When its life shows, shoot. Do not let the voice decide for you.', 'उसे अपने आगे रखो। डालियों के नीचे फिसलो। जब उसका जीवन दिखे, बाण छोड़ो। स्वर को अपने लिए निर्णय मत करने देना।') }],
+        endText: L('The deer breaks', 'मृग टूटता है') },
+      { type: 'story', theme: 'deer', cast: [{ id: 'maricha', x: 0.3, face: 1, s: 0.85 }, { id: 'ramaA', x: 0.66, face: -1, s: 1.05 }],
+        lines: D([
+          ['narrator', 'The gold splits. Under it is Maricha, and the last thing he spends is a voice he practised: Rama\'s, and not Rama\'s.', 'सोना फटता है। उसके नीचे मारीच है, और वह जो अंतिम वस्तु खर्च करता है वह एक स्वर है जिसे उसने सीखा था: राम का, और राम का नहीं।'],
+          ['maricha', 'Lakshmana. Sita. He has me.', 'लक्ष्मण। सीता। उसने मुझे घेर लिया है।'],
+          ['ramaA', 'That is my name in a mouth that hated the practising of it. The hut is the other way. Run.', 'वह मेरा नाम है, एक ऐसे मुँह में जिसे इसकी साधना से घृणा थी। कुटिया दूसरी ओर है। दौड़ो।']
+        ]) }
+    ]
+  });
+
+  // ---------------------------------------------------------------- 26
+  LEVELS.push({
+    n: 26, plate: 'bg21', title: L('Lakshmana Drawn Away', 'लक्ष्मण का जाना'), hero: 'lakA', theme: 'panch',
+    mode: L('Platformer + Story', 'प्लेटफ़ॉर्मर + कथा'), music: { raga: 'bhairav', lead: 'flute' },
+    intro: L('A cry comes in Rama\'s voice. You are Lakshmana. Sita sends you. Before you go, draw the line later tellings remember.', 'एक पुकार राम के स्वर में आती है। तुम लक्ष्मण हो। सीता तुम्हें भेजती हैं। जाने से पहले वह रेखा खींचो जिसे बाद की कथाएँ याद रखती हैं।'),
+    stars: [L('Finish the level', 'स्तर पूरा करो'), L('Draw the line', 'रेखा खींचो'), L('Cross the clearing without a fall', 'बिना गिरे समाई पार करो')],
+    star2: { stat: 'line', min: 1 }, star3: { stat: 'falls', max: 0 },
+    segs: [
+      { type: 'story', theme: 'panch', cast: [{ id: 'sitaA', x: 0.32, face: 1, s: 1.02 }, { id: 'lakStory', x: 0.66, face: -1, s: 1.05, fr: 'guard' }],
+        lines: [
+          Line('narrator', 'The cry comes through the trees already shaped like a name. It is Rama\'s voice. It is also a little too smooth.', 'पुकार वृक्षों से आती है, पहले से एक नाम का आकार लिए। यह राम का स्वर है। यह थोड़ा अधिक चिकना भी है।'),
+          Line('sitaA', 'Go. If that is him, he is alone with whatever he chased. I will not be the reason you stayed to argue.', 'जाओ। यदि वह वही हैं, तो वे अकेले हैं उसके साथ जिसका उन्होंने पीछा किया। मैं वह कारण नहीं बनूँगी जिससे तुम बहस करने रुक जाओ।', { pose: { sitaA: 'idle', lakStory: 'guard' } }),
+          Line('lakStory', 'My brother does not call for me like a man who has already lost. But I will not leave you unguarded just to be right.', 'मेरे भाई मुझे ऐसे नहीं पुकारते जैसे कोई पहले ही हार चुका हो। पर मैं सही होने के लिए तुम्हें बिना रखवाली के नहीं छोड़ूँगा।', { pose: { lakStory: 'bow' } }),
+          Line('narrator', 'Later tellings remember a line in the dust. This one does too. A boundary, asked of a guest, not a prison asked of a wife.', 'बाद की कथाएँ धूल में एक रेखा याद रखती हैं। यह कथा भी। एक सीमा, अतिथि से माँगी हुई, न कि पत्नी के लिए एक कारागार।', { pose: { lakStory: 'drawLine' }, stat: 'line' })
+        ] },
+      { type: 'platform', hero: 'lakA', theme: 'panch', len: 1800, music: 'play',
+        ground: [[0, 700], [920, 1800]],
+        npcs: [{ id: 'sitaA', x: 480, face: 1, key: 'sita', lines: D([
+          ['sitaA', 'The line is ahead of you, not behind me. Draw it, say the words, and go. I know which side of it is mine.', 'रेखा तुम्हारे आगे है, मेरे पीछे नहीं। उसे खींचो, शब्द कहो, और जाओ। मैं जानती हूँ उसका कौन सा पार मेरा है।'],
+          ['lakA', 'Do not cross it for kindness. Kindness is what a trick asks for first.', 'दया के लिए इसे मत लाँघना। दया वह है जो छल सबसे पहले माँगता है।']
+        ]) }],
+        checkpoints: [40, 800],
+        tips: [{ x: 30, t: L('You are Lakshmana. Speak to Sita, jump the gap, and draw the line at the far edge.', 'तुम लक्ष्मण हो। सीता से बात करो, खाई लाँघो, और दूर के किनारे पर रेखा खींचो।') }],
+        goal: { x: 1640, k: 'line', need: ['sita'],
+          blocked: L('Speak with Sita before the line.', 'रेखा से पहले सीता से बात करो।'),
+          line: D([['lakA', 'The line is drawn. I am going toward a voice I do not trust. Stay on this side of it.', 'रेखा खिंच गई। मैं एक ऐसे स्वर की ओर जा रहा हूँ जिस पर मेरा भरोसा नहीं। इसके इस पार रहना।']]) } },
+      { type: 'story', theme: 'panch', cast: [{ id: 'lakStory', x: 0.34, face: 1, s: 1.02, fr: 'leave' }, { id: 'sitaStory', x: 0.68, face: -1, s: 1.0, fr: 'anxious' }],
+        lines: D([
+          ['lakStory', 'If I am wrong, I will be glad to be wrong. If I am right, the line is the only thing I can leave you.', 'यदि मैं गलत हूँ, तो गलत होकर प्रसन्न होऊँगा। यदि मैं सही हूँ, तो रेखा ही एक वस्तु है जो मैं तुम्हें छोड़ सकता हूँ।'],
+          ['sitaStory', 'Go, then. And come back with him, not with an argument.', 'तो जाओ। और उनके साथ लौटना, किसी तर्क के साथ नहीं।'],
+          ['narrator', 'He goes. The clearing keeps two people in it for a little while longer: Sita, and the line.', 'वह जाता है। समाई कुछ देर और दो को अपने पास रखती है: सीता को, और रेखा को।']
+        ]) }
+    ]
+  });
+
+  // ---------------------------------------------------------------- 27
+  LEVELS.push({
+    n: 27, plate: 'bg21n', title: L("Ravana's Approach and the Line", 'रावण का आगमन और रेखा'), hero: 'sitaA', theme: 'panchNight',
+    mode: L('Story + Platformer', 'कथा + प्लेटफ़ॉर्मर'), music: { raga: 'malkauns', lead: 'veena' },
+    intro: L('You are Sita. A guest asks for alms from the far side of the line. The story does not let you refuse him. Cross, and keep your dignity while you do.', 'तुम सीता हो। एक अतिथि रेखा के उस पार से भिक्षा माँगता है। कथा तुम्हें मना नहीं करने देती। पार जाओ, और जाते हुए अपनी मर्यादा रखो।'),
+    stars: [L('Finish the level', 'स्तर पूरा करो'), L('Hear the guest\'s appeal', 'अतिथि की विनती सुनो'), L('Cross without a fall', 'बिना गिरे पार करो')],
+    star2: { stat: 'alms', min: 1 }, star3: { stat: 'falls', max: 0 },
+    segs: [
+      { type: 'story', theme: 'panchNight', cast: [{ id: 'guest', x: 0.28, face: 1, s: 1.02, fr: 'bow' }, { id: 'sitaStory', x: 0.68, face: -1, s: 1.0, fr: 'anxious' }],
+        lines: [
+          Line('narrator', 'He comes at dusk, in the ochre of a holy man, and he stops where the line asks a guest to stop.', 'वह संध्या को आता है, एक तपस्वी के गेरुए में, और वहीं रुकता है जहाँ रेखा एक अतिथि से रुकने को कहती है।', { pose: { guest: 'bow' } }),
+          Line('guest', 'Food, daughter. I have walked. I will not step where your brother-in-law forbade a stranger to step. Bring it to my hands.', 'अन्न, पुत्री। मैं चला हूँ। मैं वहाँ पैर नहीं रखूँगा जहाँ तुम्हारे देवर ने एक अजनबी को मना किया। इसे मेरे हाथों तक लाओ।', { pose: { guest: 'alms' }, stat: 'alms' }),
+          Line('sitaStory', 'The line was drawn for this. And a guest at the door is also a law. I know which of the two I was taught first.', 'रेखा इसी के लिए खींची गई थी। और द्वार पर खड़ा अतिथि भी एक नियम है। मैं जानती हूँ इन दोनों में मुझे पहले कौन सिखाया गया था।', { pose: { sitaStory: 'folded', guest: 'alms' } }),
+          Line('narrator', 'There is no third choice hidden in the grass. The chapter completes when she crosses. That is the loss, and it is still hers to walk with a straight back.', 'घास में कोई तीसरा विकल्प छिपा नहीं है। अध्याय तब पूरा होता है जब वह पार करती है। यही हार है, और फिर भी वह इसे सीधी पीठ के साथ चल सकती है।', { pose: { guest: 'cold' } })
+        ] },
+      { type: 'platform', hero: 'sitaA', theme: 'panchNight', len: 1500, noAttack: true, music: 'calm',
+        ground: [[0, 1500]],
+        npcs: [{ id: 'guest', x: 1180, face: -1, key: 'guest', lines: [
+          Line('guest', 'The alms, and nothing else. I am only hungry.', 'भिक्षा, और कुछ नहीं। मैं केवल भूखा हूँ।', { pose: { guest: 'alms' } }),
+          Line('sitaA', 'Then I bring it across. Remember, afterwards, that I came as a host, not as a prize.', 'तो मैं इसे पार ले आती हूँ। बाद में याद रखना कि मैं एक गृहस्वामिनी बनकर आई, इनाम बनकर नहीं।')
+        ] }],
+        checkpoints: [40],
+        tips: [{ x: 30, t: L('Walk to the line and past it. You cannot stay on this side and finish the chapter. That is the point of it.', 'रेखा तक चलो, और उसके पार। तुम इस पार रहकर अध्याय पूरा नहीं कर सकतीं। बात ही यही है।') }],
+        goal: { x: 1360, k: 'line', need: ['guest'],
+          blocked: L('He is waiting. Hear him before you cross.', 'वह प्रतीक्षा कर रहा है। पार जाने से पहले उसे सुनो।'),
+          line: D([['sitaA', 'I step over the line with the food in my hands. Let the forest witness that I did it for a guest.', 'मैं अन्न हाथों में लिए रेखा के पार कदम रखती हूँ। वन गवाह रहे कि मैंने यह एक अतिथि के लिए किया।']]) } },
+      { type: 'story', theme: 'panchNight', cast: [{ id: 'guest', x: 0.34, face: 1, s: 1.05, fr: 'seize' }, { id: 'sitaStory', x: 0.68, face: -1, s: 1.0, fr: 'frightened' }],
+        lines: D([
+          ['narrator', 'The ochre does not survive the crossing. The man who takes the alms is Ravana, and he does not bother to keep the voice of a holy man.', 'गेरुआ पार जाने के बाद नहीं बचता। जो भिक्षा लेता है वह रावण है, और वह तपस्वी का स्वर रखने की परवाह नहीं करता।'],
+          ['guest', 'A host should be careful what she invites across her own line. The south has room for you.', 'एक गृहस्वामिनी को सावधान रहना चाहिए कि वह अपनी ही रेखा के पार किसे बुलाती है। दक्षिण में तुम्हारे लिए स्थान है।'],
+          ['sitaStory', 'Then take nothing from me that I give as a host, and call it a victory. I know your name now. So will he.', 'तो मुझसे वह मत लेना जो मैं गृहस्वामिनी बनकर दे रही हूँ, और उसे विजय मत कहना। अब मैं तुम्हारा नाम जानती हूँ। वे भी जानेंगे।']
+        ]) }
+    ]
+  });
+
+  // ---------------------------------------------------------------- 28
+  LEVELS.push({
+    n: 28, plate: 'bg28', title: L('The Abduction', 'सीता हरण'), hero: 'ramaA', theme: 'abduct',
+    mode: L('Runner', 'दौड़'), music: { raga: 'bhairav', lead: 'veena' },
+    intro: L('The Pushpaka lifts. You cannot pull it down. Run the ground beneath it and gather the ornaments Sita throws, so the way south can be read later.', 'पुष्पक उठता है। तुम उसे नीचे नहीं खींच सकते। उसके नीचे की भूमि दौड़ो, और वे गहने समेटो जो सीता फेंकती हैं, ताकि दक्षिण का मार्ग बाद में पढ़ा जा सके।'),
+    stars: [L('Finish the level', 'स्तर पूरा करो'), L('Gather 4 ornaments', '4 गहने समेटो'), L('Take one hit or fewer', 'एक या कम चोट खाओ')],
+    star2: { stat: 'jewels', min: 4 }, star3: { stat: 'hits', max: 1 },
+    segs: [
+      { type: 'story', theme: 'abduct', cast: [{ id: 'sitaStory', x: 0.3, face: 1, s: 1.0, fr: 'frightened' }, { id: 'ravan', x: 0.62, face: -1, s: 1.05 }],
+        lines: D([
+          ['narrator', 'He does not drag her by the hair for the crowd. The chariot of the air comes down, and the ground stops being the place where this happens.', 'वह उसे भीड़ के लिए बालों से नहीं घसीटता। आकाश का रथ उतरता है, और भूमि वह स्थान नहीं रहती जहाँ यह घट रहा हो।'],
+          ['sitaStory', 'If you will not set me down, then the earth can keep what I throw. Let every jewel be a word for him.', 'यदि तुम मुझे नीचे नहीं उतारोगे, तो पृथ्वी उसे रखे जो मैं फेंकती हूँ। हर गहना उसके लिए एक शब्द हो।'],
+          ['ravan', 'Throw what you like. The south does not read the ground.', 'जो चाहो फेंको। दक्षिण भूमि नहीं पढ़ता।']
+        ]) },
+      { type: 'runner', hero: 'ramaA', theme: 'abduct', len: 9000, speed: 380, speedMax: 430, seed: 28, music: 'play', vimana: true, ornaments: true, ornamentGap: 900,
+        phases: [
+          { until: 4500, set: ['gap', 'branch', 'rock'], name: L('Under the chariot', 'रथ के नीचे') },
+          { until: 8600, set: ['gap', 'rock', 'branch'], name: L('The jewels', 'गहने') }
+        ],
+        tips: [{ x: 40, t: L('You cannot shoot the vimana down. Run, jump, and take the ornaments she drops. They are the trail.', 'तुम विमान को बाण से नहीं गिरा सकते। दौड़ो, कूदो, और जो गहने वह गिराती हैं उन्हें लो। वे ही पथ-चिह्न हैं।') }],
+        endText: L('The vimana leaves the trees', 'विमान वृक्षों से ऊपर निकल जाता है') },
+      { type: 'story', theme: 'abduct', cast: [{ id: 'ramaA', x: 0.34, face: 1, s: 1.05 }, { id: 'lakA', x: 0.64, face: -1, s: 1.05, fr: 'guard' }],
+        lines: D([
+          ['ramaA', 'The hut is empty. The line is scuffed where a host stepped over it. And the ground is holding gold that was not here at noon.', 'कुटिया खाली है। रेखा वहाँ मिटी है जहाँ एक गृहस्वामिनी ने उसे लाँघा। और भूमि वह सोना थामे है जो दोपहर को यहाँ नहीं था।'],
+          ['lakA', 'I left her with a line. Forgive the line. It was the wrong tool, and it was all I had.', 'मैं उसे एक रेखा के साथ छोड़ आया। रेखा को क्षमा करना। वह गलत औज़ार था, और मेरे पास वही था।'],
+          ['ramaA', 'We will quarrel later, if we are both still alive to do it. South. The jewels are already saying south.', 'हम बाद में झगड़ेंगे, यदि हम दोनों तब तक जीवित रहे। दक्षिण। गहने पहले ही दक्षिण कह रहे हैं।']
+        ]) }
+    ]
+  });
+
+  // ---------------------------------------------------------------- 29
+  LEVELS.push({
+    n: 29, plate: 'bg29', title: L("Jatayu's Air Battle", 'जटायु का आकाश-युद्ध'), hero: 'jatayu', theme: 'sky',
+    mode: L('Air / Flyer', 'आकाश-उड़ान'), music: { raga: 'bhairav', lead: 'flute' },
+    intro: L('You are Jatayu. Flap to climb, release to drop, strike when you are level with the Pushpaka. The battle ends when the wing gives. That is not a failure of the chapter.', 'तुम जटायु हो। चढ़ने को पंख मारो, उतरने को छोड़ो, जब पुष्पक के समानांतर हो तब प्रहार करो। युद्ध तब समाप्त होता है जब पंख टूटता है। यह अध्याय की असफलता नहीं है।'),
+    stars: [L('Finish the level', 'स्तर पूरा करो'), L('Strike the vimana 4 times', 'विमान पर 4 प्रहार करो'), L('Take one hit or fewer', 'एक या कम चोट खाओ')],
+    star2: { stat: 'smash', min: 4 }, star3: { stat: 'hits', max: 1 },
+    segs: [
+      { type: 'story', theme: 'sky', cast: [{ id: 'jatayu', x: 0.28, face: 1, s: 0.48, float: 150 }, { id: 'ravan', x: 0.7, face: -1, s: 0.9 }],
+        lines: D([
+          ['jatayu', 'Ravana. I am old, and this sky was mine before your chariot learned it. Set her down.', 'रावण। मैं बूढ़ा हूँ, और यह आकाश मेरा था इससे पहले कि तुम्हारा रथ इसे सीखे। उसे नीचे उतारो।'],
+          ['ravan', 'Then spend the wing, old bird. I have a direction, and you are in it.', 'तो पंख खर्च करो, बूढ़े पक्षी। मेरी एक दिशा है, और तुम उसी में हो।'],
+          ['narrator', 'Hold to climb. Release to fall. Strike when your height matches the chariot. A bolt rides below it: rise over that. The ending is the torn wing. Fight until the story takes it.', 'चढ़ने के लिए दबाए रखो। गिरने के लिए छोड़ो। जब तुम्हारी ऊँचाई रथ से मिले, प्रहार करो। एक बाण उसके नीचे चलता है: उसके ऊपर उठो। अंत कटा हुआ पंख है। तब तक लड़ो जब तक कथा उसे न ले ले।']
+        ]) },
+      { type: 'flyer', theme: 'sky', music: 'arena', vimHp: 6,
+        cutLine: L('The wing gives', 'पंख टूटता है'),
+        lose: L('The sky takes him before the wing does', 'पंख से पहले आकाश उसे ले जाता है'),
+        tips: [{ t: L('FLAP to rise, release to drop. STRIKE when you are level with the Pushpaka. Rise over the bolt that travels under it.', 'चढ़ने को पंख मारो, उतरने को छोड़ो। जब पुष्पक के समानांतर हो तब प्रहार करो। उसके नीचे चलने वाले बाण के ऊपर उठो।') }] },
+      { type: 'story', theme: 'sky', cast: [{ id: 'jatayu', x: 0.38, face: 1, s: 0.46, float: 170 }],
+        lines: D([
+          ['narrator', 'One wing answers and the other does not. There is no blood offered to the screen. There is a spiral, and then a forest that will have to catch a king of birds.', 'एक पंख उत्तर देता है और दूसरा नहीं। पर्दे को कोई रक्त नहीं चढ़ाया जाता। एक चक्कर है, और फिर एक वन जिसे पक्षियों के राजा को थामना होगा।'],
+          ['jatayu', 'South. Remember the word, if I am still here when the brothers arrive. South.', 'दक्षिण। शब्द याद रखना, यदि भाई जब आएँ तब मैं अभी यहाँ हूँ। दक्षिण।']
+        ]) }
+    ]
+  });
+
+  // ---------------------------------------------------------------- 30
+  LEVELS.push({
+    n: 30, plate: 'bg30', title: L('Aftermath and the Vow', 'परिणाम और प्रतिज्ञा'), hero: 'ramaA', theme: 'after',
+    mode: L('Story', 'कथा'), music: { raga: 'bhairav', lead: 'veena' },
+    intro: L('The hut is empty. Jatayu is dying, and he has one direction left in him. Hear it. Give him his fire. Speak the vow.', 'कुटिया खाली है। जटायु मर रहे हैं, और उनके भीतर एक दिशा बची है। उसे सुनो। उन्हें उनकी अग्नि दो। प्रतिज्ञा बोलो।'),
+    stars: [L('Finish the level', 'स्तर पूरा करो'), L('Hear which way Ravana went', 'सुनो रावण किधर गया'), L('Speak the vow', 'प्रतिज्ञा बोलो')],
+    star2: { stat: 'south', min: 1 }, star3: { stat: 'vow', min: 1 },
+    segs: [
+      { type: 'story', theme: 'panch', cast: [{ id: 'ramaA', x: 0.32, face: 1, s: 1.05 }, { id: 'lakA', x: 0.62, face: -1, s: 1.05, fr: 'guard' }],
+        lines: D([
+          ['narrator', 'They come back to a hut that has kept their bowls and lost their third. The fire is ash. The line is a scuff. The gold on the path points out of the clearing and does not bother to explain itself.', 'वे एक ऐसी कुटिया पर लौटते हैं जिसने उनके पात्र रखे हैं और उनके तीसरे को खो दिया है। अग्नि राख है। रेखा एक घिसाव है। पथ पर सोना समाई से बाहर की ओर इशारा करता है और अपनी व्याख्या नहीं करता।'],
+          ['lakA', 'Say it, if you are going to say it.', 'कह दो, यदि तुम्हें कहना ही है।'],
+          ['ramaA', 'Not here. The ground is already speaking. Someone further along this gold has spent a wing.', 'यहाँ नहीं। भूमि पहले से बोल रही है। इस सोने के आगे किसी ने एक पंख खर्च किया है।']
+        ]) },
+      { type: 'story', theme: 'after', cast: [{ id: 'jatayu', x: 0.28, face: 1, s: 0.42, float: 190 }, { id: 'ramaStory', x: 0.68, face: -1, s: 1.0, fr: 'kneelGrief' }],
+        lines: [
+          Line('jatayu', 'Rama. I knew your father\'s sky. I did not know I would die in his son\'s. Ravana has her. The chariot went south.', 'राम। मैं तुम्हारे पिता का आकाश जानता था। मैं नहीं जानता था कि मैं उनके पुत्र के आकाश में मरूँगा। रावण उसे ले गया है। रथ दक्षिण गया।', { stat: 'south' }),
+          Line('ramaStory', 'Then south is a true word, and you spent a wing to buy it. Stay a moment. A king of birds is not left in the leaves.', 'तो दक्षिण एक सच्चा शब्द है, और तुमने इसे खरीदने के लिए एक पंख खर्च किया। एक क्षण ठहरो। पक्षियों के राजा को पत्तों में नहीं छोड़ा जाता।', { pose: { ramaStory: 'kneelGrief' } }),
+          Line('narrator', 'Rama gathers what will burn cleanly. There is no spectacle in the rite. There is a fire, and a name said the way a name is said when the person can no longer correct it, and then the smoke goes the same way the chariot went.', 'राम वह समेटते हैं जो स्वच्छ जलेगा। विधि में कोई तमाशा नहीं। एक अग्नि है, और एक नाम उस तरह कहा जाता है जैसे तब कहा जाता है जब व्यक्ति उसे सुधार नहीं सकता, और फिर धुआँ उसी दिशा जाता है जिधर रथ गया था।'),
+          Line('jatayu', 'That is enough. I was old before the wing. Tell the south I was not late.', 'बस। मैं पंख से पहले ही बूढ़ा था। दक्षिण से कहना कि मैं देर से नहीं आया था।')
+        ] },
+      { type: 'story', theme: 'after', cast: [{ id: 'ramaStory', x: 0.4, face: 1, s: 1.05, fr: 'vow' }, { id: 'lakA', x: 0.7, face: -1, s: 1.05 }],
+        lines: [
+          Line('ramaA', 'I vow this, and the forest can keep the wording. I will go south. I will find her. I will bring her home. I will not call the search finished while I can still walk.', 'मैं यह प्रतिज्ञा करता हूँ, और शब्द वन अपने पास रखे। मैं दक्षिण जाऊँगा। मैं उसे खोजूँगा। मैं उसे घर लाऊँगा। जब तक मैं चल सकता हूँ, खोज को समाप्त नहीं कहूँगा।', { pose: { ramaStory: 'vow' }, stat: 'vow' }),
+          Line('lakA', 'Then I am the other pair of feet. We do not split the vow to make it lighter.', 'तो मैं पैरों की दूसरी जोड़ी हूँ। हम प्रतिज्ञा को हल्का करने के लिए बाँटेंगे नहीं।'),
+          Line('narrator', 'The hut stays behind them, small, and accurate. Somewhere ahead, the vow is already a sound in a country they have not entered.', 'कुटिया उनके पीछे रह जाती है, छोटी, और सही। कहीं आगे, प्रतिज्ञा पहले से एक ध्वनि है एक ऐसे देश में जिसमें वे अभी दाखिल नहीं हुए।')
+        ] }
+    ]
+  });
+
+  window.RPD_LATER = [];
 })();
