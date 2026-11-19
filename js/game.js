@@ -27,6 +27,7 @@
   SAVE.unlocked = SAVE.unlocked || 1; SAVE.best = SAVE.best || {}; SAVE.lang = SAVE.lang || 'en';
   if (SAVE.mute == null) SAVE.mute = false; if (SAVE.vibe == null) SAVE.vibe = true;
   if (SAVE.best && SAVE.best[8] && SAVE.unlocked < 9) SAVE.unlocked = 9;
+  if (SAVE.best && SAVE.best[14] && SAVE.unlocked < 15) SAVE.unlocked = 15;
   if (Q.get('unlock') === '1') SAVE.unlocked = 30;
   if (Q.get('lang') === 'hi') SAVE.lang = 'hi';
   function persist() { store.set('rpd_save_v1', SAVE); }
@@ -51,20 +52,24 @@
     sunset: ['The sun has set on the range', 'धनुष-क्षेत्र पर सूरज ढल गया'], outOfPips: ['Your strength is spent', 'तुम्हारी शक्ति समाप्त हुई'], teacherStops: ['The teacher stops the bout', 'गुरु ने मुक़ाबला रोक दिया'],
     meditBroken: ['The meditation shattered', 'ध्यान बिखर गया'], focusSpent: ['Your focus is spent for today', 'आज की एकाग्रता समाप्त'], hits: ['Hits', 'भेदन'], arrows: ['Arrows', 'बाण'],
     penance: ['Penance', 'तप'], steadiness: ['Steadiness', 'स्थिरता'], dayLeft: ['Daylight', 'दिन का प्रकाश'], focusL: ['Focus', 'एकाग्रता'], time: ['Time', 'समय'],
-    levelSel: ['Chronicle', 'कथा-क्रम'], storyCard: ['Levels 9 to 14 are open in the chronicle. From the bow of Mithila onward, the rest of this telling is still being painted.', 'स्तर 9 से 14 कथा-क्रम में खुले हैं। मिथिला के धनुष के आगे की कथा अभी चित्रित हो रही है।'],
+    levelSel: ['Chronicle', 'कथा-क्रम'], storyCard: ['Levels 9 to 19 are open in the chronicle. The forest years are still being painted.', 'स्तर 9 से 19 कथा-क्रम में खुले हैं। वन के वर्ष अभी चित्रित हो रहे हैं।'],
     mark: ['Mark', 'निशान'], demo: ['DEMO', 'डेमो'], arenaIntro: ['A sporting bout. Fill her training meter!', 'खेल का मुक़ाबला। उसका प्रशिक्षण-मीटर भरो!'],
     clean: ['Clean sequence!', 'साफ़ क्रम!'], again: ['Again: light feet!', 'फिर से: हल्के पैर!'], woof: ['Woof! Back you go', 'भौं! वापस जाओ'], splash: ['Splash! Back to the lamp', 'छपाक! दीये तक वापस'],
     oof: ['Oof!', 'उफ़!'], boarBeaten: ['The boar is beaten!', 'सूअर हार गया!'], pulled: ['Pulled up!', 'ऊपर खींचा!'], standard: ['War-standard', 'युद्ध-ध्वज'], lotusFound: ['Hidden lotus!', 'छिपा कमल!'],
     hold: ['HOLD', 'दबाओ'], tap: ['TAP', 'टैप'], beat: ['On the beat!', 'थाप पर!'], offBeat: ['Off the beat', 'थाप से चूके'], weak: ['Draw fully first', 'पहले पूरा खींचो'],
     bird: ['The bird!', 'पक्षी!'], ignore: ['Ignore the shout!', 'शोर अनसुना करो!'], markReset: ['Out of arrows: the mark resets', 'बाण समाप्त: निशान फिर से'], best: ['Best', 'सर्वश्रेष्ठ'],
     continued: ['To be continued', 'आगे की कथा'], moreChapters: ['More chapters are being painted', 'आगे के अध्याय चित्रित हो रहे हैं'],
-    soonBody: ['Mithila’s bow is still ahead, and after it the exile, the forest, and a vow. This telling pauses here, on the road. The next chapters will come.', 'मिथिला का धनुष अभी आगे है, और उसके बाद वनवास, वन, और एक प्रतिज्ञा। यह कथा यहीं, मार्ग पर, थोड़ी देर रुकती है। अगले अध्याय आएँगे।'],
+    soonBody: ['The gate of Ayodhya is behind you. The forest years, a golden deer, and a vow are still ahead. This telling pauses on the road.', 'अयोध्या का द्वार पीछे रह गया है। वन के वर्ष, एक स्वर्ण मृग, और एक प्रतिज्ञा अभी आगे हैं। यह कथा मार्ग पर रुकती है।'],
     soonList: ['What is still to be told', 'जो कथा अभी शेष है'],
     sacrifice: ['The sacrifice', 'यज्ञ'], wave: ['Wave', 'लहर'],
     altarBroken: ['The sacrificial fire is defiled', 'यज्ञ की अग्नि अपवित्र हो गई'],
     theyCome: ['They come from the trees', 'वे वृक्षों से आ रहे हैं'],
     fireHolds: ['The fire holds', 'अग्नि टिकी है'],
-    loadingArt: ['The next paintings are still arriving…', 'अगले चित्र अभी आ रहे हैं…']
+    loadingArt: ['The next paintings are still arriving…', 'अगले चित्र अभी आ रहे हैं…'],
+    defendFlame: ['Defend this flame', 'इस लौ की रक्षा'],
+    yieldHand: ['He stays his hand', 'वह हाथ रोकता है'],
+    pinakaBreak: ['The Pinaka breaks', 'पिनाक टूटता है'],
+    againSoft: ['The bow waits. Again.', 'धनुष रुकता है। फिर से।']
   };
   function T(k) { var s = STR[k]; return s ? (SAVE.lang === 'hi' ? s[1] : s[0]) : k; }
   function tr(o) { return o ? (SAVE.lang === 'hi' ? (o.hi || o.en) : o.en) : ''; }
@@ -225,7 +230,8 @@
     rama: { sh: 'rama', s: 0.62, melee: false, run: RUN6, idle: 'idle', jump: 'jump', fall: 'jump', a1: 'shoot', a2: 'shoot', a3: 'shoot', hurt: 'hurt', slide: 'kneel', block: 'kneel', trail: 'rgba(255,220,140,', name: 'rama' },
     sita: { sh: 'sita', s: 0.63, melee: false, run: RUN6, idle: 'idle', jump: 'jump', fall: 'jump', a1: 'release', a2: 'draw', a3: 'focus', hurt: 'hurt', slide: 'kick', block: 'aim', kick: 'kick', trail: 'rgba(255,200,120,', name: 'sita' },
     lak: { sh: 'lak', s: 0.66, melee: true, run: RUN6, idle: 'idle', jump: 'jump', fall: 'jump', a1: 'slash', a2: 'heavy', a3: 'slash2', hurt: 'hurt', slide: 'guard', block: 'guard', trail: 'rgba(170,255,170,', name: 'lak' },
-    ramaA: { sh: 'rama_adult', s: 0.66, melee: false, run: RUN6, idle: 'idle', jump: 'jump', fall: 'jump', a1: 'shoot', a2: 'shoot', a3: 'shoot', hurt: 'hurt', slide: 'kneel', block: 'kneel', trail: 'rgba(255,220,140,', name: 'ramaA' },
+      ramaA: { sh: 'rama_adult', s: 0.66, melee: false, run: RUN6, idle: 'idle', jump: 'jump', fall: 'jump', a1: 'shoot', a2: 'shoot', a3: 'shoot', hurt: 'hurt', slide: 'kneel', block: 'kneel', trail: 'rgba(255,220,140,', name: 'ramaA' },
+      sitaA: { sh: 'sita_adult', s: 0.64, melee: false, run: RUN6, idle: 'idle', jump: 'jump', fall: 'jump', a1: 'release', a2: 'draw', a3: 'focus', hurt: 'hurt', slide: 'kick', block: 'aim', trail: 'rgba(255,200,140,', name: 'sitaA' },
     lakA: { sh: 'lak_adult', s: 0.72, melee: true, run: RUN6, idle: 'idle', jump: 'jump', fall: 'jump', a1: 'slash', a2: 'heavy', a3: 'slash2', hurt: 'hurt', slide: 'guard', block: 'guard', trail: 'rgba(170,230,140,', name: 'lakA' },
     ravan: { sh: 'ravanan', s: 0.7, melee: true, run: RUN6, idle: 'idle', jump: 'jump', fall: 'fall', a1: 'slash', a2: 'special', a3: 'special', hurt: 'hurt', slide: 'slide', block: 'idle2', trail: 'rgba(255,186,70,', name: 'ravan' }
   };
@@ -239,6 +245,8 @@
       boon: ['puppet_dashanan_boon', victory ? 'crowned' : 'pray', 0.9],
       ravan: ['ravanan', victory ? 'special' : 'idle', 1.05],
       ramaA: ['rama_adult', victory ? 'shoot' : 'idle', 1.15],
+      sitaA: ['sita_adult', victory ? 'focus' : 'idle', 1.12],
+      king: ['puppet_dasharatha', victory ? 'grief' : 'stand', 0.95],
       lakA: ['lak_adult', victory ? 'slash' : 'idle', 1.15]
     };
     return map[id] || map.rama;
@@ -368,6 +376,12 @@
   function underCeiling(h, w) { var b = [h.x - 17, h.y - 128, h.x + 17, h.y - 40]; for (var i = 0; i < w.solids.length; i++) { var s = w.solids[i]; if (!s.off && overlap(b, [s.x, s.y, s.x + s.w, s.y + s.h])) return true; } return false; }
   function dust(x, y, n) { ART.spawn('dust', x, y - 4, { n: n || 5, ang: -1.57, spread: 2.6, speed: 90, life: 0.5, r: 5, col: 'rgba(210,190,160,0.55)', g: 120, drag: 2 }); }
   function sparks(x, y, col, n) { ART.spawn('spark', x, y, { n: n || 10, speed: 380, life: 0.32, col: col || '#ffd27a', g: 600 }); ART.spawn('glow', x, y, { n: 1, speed: 0, life: 0.18, r: 22, col: 'rgba(255,220,150,0.8)' }); }
+  // Soft gold flash, ~80 ms, peaking near 45% so the painted sprite stays readable.
+  function foeTint(t, strong) {
+    if (!t || t <= 0) return 0;
+    var peak = strong ? 0.45 : 0.2;
+    return Math.min(peak, (t / 0.08) * peak);
+  }
   // attack chain: 1 tap light, 2 taps heavy, 3 taps special (needs full meter) - runner's slash()
   function attackPress(h, onFire) {
     if (h.chainT > 0 && h.chainN < 3) h.chainN++; else h.chainN = 1;
@@ -593,7 +607,7 @@
     }
     function hitFoe(f, dmg, kx) {
       if (f.dead) return;
-      f.hp -= dmg; f.hurt = 0.25; f.vx = kx * 260; f.st = 'stagger'; f.tt = 0.35; hitstop(0.05); shake(5); sparks(f.x, f.y - 60, '#ffb070', 12); AU.sfx('hit');
+      f.hp -= dmg; f.hurt = 0.08; f.vx = kx * 260; f.st = 'stagger'; f.tt = 0.35; hitstop(0.05); shake(5); sparks(f.x, f.y - 60, '#ffb070', 12); AU.sfx('hit');
       addMeter(20);
       if (f.hp <= 0) { f.dead = true; G.score += 100; ART.spawn('smoke', f.x, f.y - 60, { n: 14, speed: 120, life: 1, r: 18, col: 'rgba(40,30,30,1)' }); ART.spawn('ember', f.x, f.y - 60, { n: 16, speed: 240, life: 0.9, r: 2.4, col: '#ff8a3a' }); }
     }
@@ -1048,13 +1062,13 @@
       var frs = f.t === 'raider' ? ['raider0', 'raider1'] : ['brute0', 'brute1'];
       var fr2 = atk ? (f.t === 'raider' ? 'raiderAtk' : 'bruteAtk') : frs[Math.floor(G.t * (f.run ? 8 : 3)) % 2];
       var hurtFr = f.t === 'brute' && f.hurt > 0 ? 'bruteHurt' : fr2;
-      SPR.draw(g, 'rakshasa', hurtFr, x, f.y + 4, { s: f.t === 'brute' ? 0.62 : 0.55, cx: true, face: f.face, tint: '#ffffff', tintA: f.hurt * (f.t === 'raider' ? 5 : 3) });
+      SPR.draw(g, 'rakshasa', hurtFr, x, f.y + 4, { s: f.t === 'brute' ? 0.62 : 0.55, cx: true, face: f.face, tint: '#ffe2a0', tintA: foeTint(f.hurt, f.t === 'raider') });
       return;
     }
     var fr = f.t + (Math.floor(G.t * (f.st === 'lunge' || f.run ? 10 : 3)) % 2);
     if (f.t === 'spirit') { ART.glow(g, x, f.y - 60, 90, f.st === 'tele' ? 'rgba(255,80,60,0.6)' : 'rgba(120,40,140,0.35)'); }
     else ART.shadow(g, x, GY, 40, 0.35);
-    SPR.draw(g, 'foe', fr, x, f.y + 4, { s: f.t === 'spirit' ? 0.62 : 0.55, cx: true, face: f.face, tint: '#ffffff', tintA: f.hurt * 3, alpha: f.t === 'spirit' ? 0.92 : 1 });
+    SPR.draw(g, 'foe', fr, x, f.y + 4, { s: f.t === 'spirit' ? 0.62 : 0.55, cx: true, face: f.face, tint: '#ffe2a0', tintA: foeTint(f.hurt, false), alpha: f.t === 'spirit' ? 0.92 : 1 });
     if (f.st === 'tele') ART.text(g, '!', x, f.y - 160, { size: 34, align: 'center', col: '#ff6a4a', sw: 5, bold: true });
   }
   function drawGoal(goal, cam, open) {
@@ -1062,6 +1076,11 @@
     if (goal.k === 'shrine') { ART.glow(g, x, GY - 90, 200, 'rgba(255,200,120,0.4)'); SPR.draw(g, 'prop', 'shrine', x, GY + 6, { s: 0.7, cx: true }); }
     else if (goal.k === 'gate') { SPR.draw(g, 'scen', 'arch', x, GY + 8, { s: 0.95, cx: true }); if (!open) { g.fillStyle = 'rgba(90,50,20,0.85)'; g.fillRect(x - 60, GY - 190, 120, 190); g.strokeStyle = '#d8a050'; g.lineWidth = 3; g.strokeRect(x - 60, GY - 190, 120, 190); } else ART.glow(g, x, GY - 100, 150, 'rgba(255,230,160,0.55)'); }
     else if (goal.k === 'mark') { g.fillStyle = '#6a4a2a'; g.fillRect(x - 3, GY - 120, 6, 120); g.fillStyle = '#e8c060'; g.beginPath(); g.arc(x, GY - 120, 16, 0, 6.283); g.fill(); ART.glow(g, x, GY - 120, 50, 'rgba(255,220,120,0.6)'); }
+    else if (goal.k === 'pinaka') {
+      ART.glow(g, x, GY - 120, open ? 180 : 70, open ? 'rgba(255,220,120,0.7)' : 'rgba(255,200,100,0.25)');
+      SPR.draw(g, 'props_9_30', 'pinaka', x, GY - 20, { s: 0.85, cx: true, sy: 1 + Math.sin(G.t * 2) * 0.02 });
+      if (open) ART.text(g, 'पिनाक', x, GY - 200, { size: 18, align: 'center', gold: true });
+    }
     else if (goal.k === 'altar') {
       ART.glow(g, x, GY - 70, 160, 'rgba(255,150,50,0.55)');
       SPR.draw(g, 'props_9_30', 'yagnaAltar', x, GY + 6, { s: 0.85, cx: true });
@@ -1171,7 +1190,7 @@
         if (mb && !(hero.atk.hit[o.x]) && o.t !== 'cave' && o.t !== 'branch' && overlap(mb, obox(o))) {
           hero.atk.hit[o.x] = 1; o.hp -= hero.atk.n; sparks(o.x, (obox(o)[1] + obox(o)[3]) / 2, '#ffd08a', 10); AU.sfx('hit'); hitstop(0.04);
           if (o.hp <= 0) smashIt(o);
-          else { o.shk = 0.2; pop(o.x, GY - 130, '×2', '#ffe0b0', 18); }
+          else { o.shk = 0.08; pop(o.x, GY - 130, '×2', '#ffe0b0', 18); }
         }
         if (o.dead) return;
         if (o.t === 'fall' && o.st !== 'land' && o.st !== 'drop') { if (!o.passed && d < -60) o.passed = true; return; }
@@ -1192,7 +1211,7 @@
           var ob = obs[oi]; if (ob.dead || ob.t === 'cave' || ob.t === 'branch') continue;
           if (ob.t === 'fall' && ob.st !== 'land' && ob.st !== 'drop') continue;
           if (overlap([ar.x - 10, ar.y - 8, ar.x + 10, ar.y + 8], obox(ob))) {
-            spent = true; ob.hp -= ar.dmg; ob.shk = 0.2; sparks((obox(ob)[0] + obox(ob)[2]) / 2, (obox(ob)[1] + obox(ob)[3]) / 2, '#ffd08a', 8); AU.sfx('hit'); hitstop(0.04);
+            spent = true; ob.hp -= ar.dmg; ob.shk = 0.08; sparks((obox(ob)[0] + obox(ob)[2]) / 2, (obox(ob)[1] + obox(ob)[3]) / 2, '#ffd08a', 8); AU.sfx('hit'); hitstop(0.04);
             if (ob.hp <= 0) smashIt(ob); else pop(ob.x, GY - 130, '×' + ar.n, '#ffe0b0', 18);
           }
         }
@@ -1270,13 +1289,13 @@
       else if (o.t === 'wolf') { ART.shadow(g, x, GY, 44, 0.35); SPR.draw(g, 'foe', 'wolf' + (Math.floor(G.t * 10) % 2), x, GY + 4, { s: 0.52, cx: true, face: -1 }); }
       else if (o.t === 'boar') {
         ART.shadow(g, x, GY, 50, 0.35);
-        if (!SPR.draw(g, 'foes_forest', 'boar' + (Math.floor(G.t * 8) % 2), x, GY + 4, { s: 0.7, cx: true, face: -1, tint: '#ffffff', tintA: (o.shk || 0) * 3 }))
+        if (!SPR.draw(g, 'foes_forest', 'boar' + (Math.floor(G.t * 8) % 2), x, GY + 4, { s: 0.7, cx: true, face: -1, tint: '#ffe2a0', tintA: foeTint(o.shk, false) }))
           SPR.draw(g, 'foe', 'wolf0', x, GY + 4, { s: 0.52, cx: true, face: -1 });
       }
       else if (o.t === 'raider') {
         ART.shadow(g, x, GY, 40, 0.35);
         var rf = (o.shk > 0) ? 'raiderAtk' : ('raider' + (Math.floor(G.t * 8) % 2));
-        SPR.draw(g, 'rakshasa', rf, x, GY + 4, { s: 0.52, cx: true, face: -1, tint: '#ffffff', tintA: (o.shk || 0) * 5 });
+        SPR.draw(g, 'rakshasa', rf, x, GY + 4, { s: 0.52, cx: true, face: -1, tint: '#ffe2a0', tintA: foeTint(o.shk, true) });
       }
       else if (o.t === 'eagle') { ART.shadow(g, x, GY, 30, 0.2); SPR.draw(g, 'foe', 'eagle' + (Math.floor(G.t * 8) % 2), x, o.yy + 40, { s: 0.5, cx: true, face: -1 }); }
       else if (o.t === 'branch') {
@@ -1309,16 +1328,18 @@
 
   // ---------------- ARENA mode (fixed screen). Teacher spar, or a roster of painted foes. ----------------
   var FOES = {
-    teacher: { id: 'teacher', sh: 'teacher', s: 0.8, hurtTint: false, defeatRot: false, reach: 200, patterns: ['strike', 'sweep', 'guard'],
+    teacher: { id: 'teacher', sh: 'teacher', s: 0.8, hurtFrame: true, defeatRot: false, reach: 200, patterns: ['strike', 'sweep', 'guard'],
       fr: { intro: 'ready', idle: 'ready', advance: 'step', guard: 'block', windup: 'windup', strike: 'strike', sweepWind: 'windup', sweep: 'sweep', recover: 'ready', stagger: 'hurt', bow: 'bow' } },
-    guard: { id: 'guard', sh: 'lanka_guards', s: 0.74, hurtTint: true, defeatRot: true, reach: 168, patterns: ['strike'],
+    guard: { id: 'guard', sh: 'lanka_guards', s: 0.74, hurtFrame: false, defeatRot: true, reach: 168, patterns: ['strike'],
       fr: { intro: 'guard0', idle: 'guard0', advance: 'guard1', guard: 'guard0', windup: 'guardThrust', strike: 'guardThrust2', sweepWind: 'guardThrust', sweep: 'guardThrust2', recover: 'guard1', stagger: 'guard0', bow: 'guard0' } },
-    captain: { id: 'captain', sh: 'lanka_guards', s: 0.8, hurtTint: true, defeatRot: true, reach: 210, patterns: ['strike', 'sweep'],
+    captain: { id: 'captain', sh: 'lanka_guards', s: 0.8, hurtFrame: false, defeatRot: true, reach: 210, patterns: ['strike', 'sweep'],
       fr: { intro: 'captain0', idle: 'captain0', advance: 'captain1', guard: 'captain0', windup: 'captainSlash', strike: 'captainSlash2', sweepWind: 'captainSlash', sweep: 'captainSlash2', recover: 'captain1', stagger: 'captain0', bow: 'captain0' } },
-    tataka: { id: 'tataka', sh: 'tataka', s: 0.8, hurtTint: false, defeatRot: false, reach: 248, patterns: ['strike', 'sweep', 'guard'],
+    tataka: { id: 'tataka', sh: 'tataka', s: 0.8, hurtFrame: true, defeatRot: false, reach: 248, patterns: ['strike', 'sweep', 'guard'],
       fr: { intro: 'ready', idle: 'ready', advance: 'step', guard: 'block', windup: 'windup', strike: 'strike', sweepWind: 'windup', sweep: 'sweep', recover: 'ready', stagger: 'hurt', bow: 'defeat' } },
-    subahu: { id: 'subahu', sh: 'subahu', s: 0.76, hurtTint: false, defeatRot: false, reach: 196, patterns: ['strike', 'sweep', 'guard'],
-      fr: { intro: 'ready', idle: 'ready', advance: 'step', guard: 'block', windup: 'windup', strike: 'strike', sweepWind: 'windup', sweep: 'sweep', recover: 'ready', stagger: 'hurt', bow: 'defeat' } }
+    subahu: { id: 'subahu', sh: 'subahu', s: 0.76, hurtFrame: true, defeatRot: false, reach: 196, patterns: ['strike', 'sweep', 'guard'],
+      fr: { intro: 'ready', idle: 'ready', advance: 'step', guard: 'block', windup: 'windup', strike: 'strike', sweepWind: 'windup', sweep: 'sweep', recover: 'ready', stagger: 'hurt', bow: 'defeat' } },
+    parashurama: { id: 'parashurama', sh: 'parashurama', s: 0.78, hurtFrame: true, defeatRot: false, reach: 206, patterns: ['strike', 'sweep', 'guard'],
+      fr: { intro: 'ready', idle: 'ready', advance: 'step', guard: 'block', windup: 'windup', strike: 'strike', sweepWind: 'windup', sweep: 'sweep', recover: 'ready', stagger: 'hurt', bow: 'recognise', yield: 'recognise' } }
   };
   function ArenaMode(seg) {
     var th = theme(seg.theme), M = { kind: 'arena', touch: 'arena', swipes: true, t: 0, done: false, fail: null };
@@ -1345,13 +1366,18 @@
       if (G.pips <= 0) { if (DEMO) G.pips = 1; else M.fail = (F.prof && F.prof.id !== 'teacher') ? (tr(seg.lose) || T('outOfPips')) : T('teacherStops'); }
     }
     function dmgFoe(v, kind, x, y) {
-      if (F.st === 'bow' || F.st === 'intro') return;
+      if (F.st === 'bow' || F.st === 'intro' || F.st === 'yield') return;
       if (F.st === 'guard' && kind === 'light') { AU.sfx('clang'); sparks(x, y, '#cfe0ff', 8); pop(F.x, F.y - 190, T('blocked'), '#cfe0ff', 20); return; }
       var open = F.st === 'recover';
       if (open) { v *= 2; G.stats.perfect++; pop(F.x, F.y - 200, T('perfect'), '#ffe27a', 28); AU.sfx('perfect'); slowmo(0.12); }
       else AU.sfx(kind === 'kick' ? 'hit' : 'thunk');
-      F.hp = Math.max(0, F.hp - v); F.hurt = 0.22; G.score += v * 10; G.meter = Math.min(100, G.meter + (open ? 30 : 20));
+      F.hp = Math.max(0, F.hp - v); F.hurt = 0.08; G.score += v * 10; G.meter = Math.min(100, G.meter + (open ? 30 : 20));
       sparks(x, y, open ? '#ffe27a' : '#ffd0a0', open ? 16 : 9); hitstop(open ? 0.08 : 0.05); shake(open ? 8 : 5);
+      if (seg.yieldAt && F.hp / F.max <= seg.yieldAt) {
+        F.hp = Math.max(1, F.hp); F.st = 'yield'; F.t = 2.5; F.vx = 0;
+        slowmo(0.45); flash(0.35, '255,226,160'); AU.sfx('aura');
+        banner(tr(seg.yieldLine) || T('yieldHand'), '', 2.2); G.score += 800; return;
+      }
       if (F.st === 'guard' || F.st === 'windup' || F.st === 'sweepWind') { if (kind !== 'light' || open) { F.st = 'stagger'; F.t = 0.4; } }
       else if (F.st !== 'recover') { F.st = 'stagger'; F.t = 0.3; }
       F.vx = (F.x > hero.x ? 1 : -1) * (kind === 'kick' ? 520 : 200);
@@ -1370,7 +1396,7 @@
       hero.blocking = blk && !hero.atk;
       physHero(hero, dt, w, { mx: blk ? 0 : mx, jumpP: IN.jumpP(), jumpHeld: IN.jumpHeld(), downP: false, crouch: IN.downHeld(), minX: 50, maxX: W - 50, lockFace: true });
       hero.face = F.x > hero.x ? 1 : -1;
-      if (IN.atkP() && !hero.blocking && F.st !== 'bow') attackPress(hero, onFire);
+      if (IN.atkP() && !hero.blocking && F.st !== 'bow' && F.st !== 'yield') attackPress(hero, onFire);
       if (M.kickPend && hero.atk && hero.atk.kick && hero.atk.t > 0.1) { M.kickPend = false; if (Math.abs(F.x - hero.x) < 160) dmgFoe(8, 'kick', (F.x + hero.x) / 2, GY - 80); }
       // arrows
       for (var i = arrows.length - 1; i >= 0; i--) {
@@ -1378,7 +1404,7 @@
         if (Math.abs(a.x - F.x) < 38 && a.y > F.y - 190 && a.y < F.y && !a.hits.f) { a.hits.f = 1; dmgFoe(a.n === 1 ? 5 : a.n === 2 ? 10 : 8, a.n === 1 ? 'light' : 'heavy', a.x, a.y); if (a.n === 1 || F.st !== 'bow') { arrows.splice(i, 1); continue; } }
         if (a.life <= 0 || a.x < -50 || a.x > W + 50) arrows.splice(i, 1);
       }
-      if (hero.A.melee && meleeActive(hero) && hero.atk && !hero.atk.hit.foe && F.st !== 'bow' && F.st !== 'intro') {
+      if (hero.A.melee && meleeActive(hero) && hero.atk && !hero.atk.hit.foe && F.st !== 'bow' && F.st !== 'intro' && F.st !== 'yield') {
         var mb = meleeBox(hero);
         if (mb && overlap(mb, [F.x - 52, GY - 180, F.x + 52, GY])) {
           hero.atk.hit.foe = 1;
@@ -1424,6 +1450,7 @@
           if (F.t <= 0) { F.st = 'recover'; F.t = 0.8; } break;
         case 'recover': if (F.t <= 0) { F.st = 'idle'; F.t = 0.5 + Math.random() * 0.4; if (ad < 160) F.vx = -F.face * 380; } break;
         case 'stagger': if (F.t <= 0) { F.st = 'idle'; F.t = 0.35; } break;
+        case 'yield': if (F.t <= 0 && !M.done) M.done = true; break;
         case 'bow':
           if (F.t <= 0 && !F._next) {
             F._next = true;
@@ -1438,7 +1465,7 @@
     };
     M.ai = function (C) {
       var d = F.x - hero.x, ad = Math.abs(d); C.mx = 0; C.block = false; C.jumpHeld = !hero.gr && hero.vy < 0;
-      if (F.st === 'bow' || F.st === 'intro') return;
+      if (F.st === 'bow' || F.st === 'intro' || F.st === 'yield') return;
       if (F.st === 'windup' && ad < 300) { C.block = true; return; }
       if (F.st === 'strike' && ad < 300) { C.block = true; return; }
       if (F.st === 'sweepWind' && ad < 320 && F.t < 0.32 && hero.gr) { C.jumpP = true; C.jumpHeld = true; return; }
@@ -1480,7 +1507,7 @@
       if (F.st === 'sweep') { g.strokeStyle = 'rgba(180,220,255,0.7)'; g.lineWidth = 10; g.beginPath(); g.ellipse(F.x, GY - 16, 220 * (1 - F.t / 0.32), 18, 0, 0, Math.PI); g.stroke(); }
       var sink = 0, rotD = 0, alF = 1;
       if (F.st === 'bow' && F.prof.defeatRot) { var u = 1 - Math.max(0, F.t) / 2.2; sink = u * 40; rotD = u * 1.15; alF = Math.max(0.15, 1 - u * 0.75); }
-      if (!SPR.draw(g, F.prof.sh, fr, F.x, GY + 4 + sink, { s: F.prof.s, face: F.face, rot: rotD * F.face, alpha: alF, tint: '#ffffff', tintA: F.hurt * (F.prof.hurtTint ? 5.5 : 3) }))
+      if (!SPR.draw(g, F.prof.sh, fr, F.x, GY + 4 + sink, { s: F.prof.s, face: F.face, rot: rotD * F.face, alpha: alF, tint: '#ffe2a0', tintA: foeTint(F.hurt, !F.prof.hurtFrame) }))
         ART.fallbackFigure(g, F.x, GY, 200, '#6a3030', F.face);
       drawHero(g, hero, 0, { s: 1.24, glow: G.meter >= 100 ? 'rgba(255,220,140,0.5)' : null });
       if (hero.blocking) { ART.glow(g, hero.x + hero.face * 30, hero.y - 90, 60, 'rgba(160,210,255,0.55)'); }
@@ -1810,7 +1837,7 @@
       foes.push({ t: t, x: W + 40, y: GY, hp: brute ? 8 : 4, max: brute ? 8 : 4, speed: brute ? 40 : 74, face: -1, st: 'walk', tt: 0.6, hurt: 0, vx: 0, dead: false });
     }
     function kill(f, dmg) {
-      f.hp -= dmg; f.hurt = 0.2; sparks(f.x, GY - 70, '#ffd0a0', 8); AU.sfx('hit'); hitstop(0.04);
+      f.hp -= dmg; f.hurt = 0.08; sparks(f.x, GY - 70, '#ffd0a0', 8); AU.sfx('hit'); hitstop(0.04);
       G.score += 40; G.meter = Math.min(100, G.meter + 12);
       if (f.hp <= 0) { f.dead = true; G.score += 120; ART.spawn('smoke', f.x, GY - 60, { n: 8, speed: 90, life: 0.7, r: 16, col: 'rgba(40,30,28,1)' }); AU.sfx('smash'); }
       else { f.st = 'stagger'; f.tt = 0.28; f.vx = 220; }
@@ -1898,17 +1925,25 @@
       ART.groundBlock(g, th, -20, W + 20, GY, GY, H, 0);
       w.plats.forEach(function (p) { drawPlat(p, 0); });
       (seg.decor || []).forEach(function (d) { SPR.draw(g, d.sh || 'scenery_9_30', d.k, d.x, GY + 4, { s: d.s || 0.7, cx: true, face: d.face || 1 }); });
-      ART.glow(g, altarX, GY - 80, 150 + (100 - altar), 'rgba(255,140,40,0.55)');
-      SPR.draw(g, 'props_9_30', 'yagnaAltar', altarX, GY + 6, { s: 0.85, cx: true });
-      SPR.draw(g, 'props_9_30', 'flameColumn', altarX, GY - 8, { s: 0.5 * (0.55 + altar / 180), cx: true, sy: 1 + Math.sin(G.t * 10) * 0.05 });
-      ART.bar(g, altarX - 46, GY - 168, 92, 10, altar / 100, altar < 40 ? '#ff6a4a' : '#ffb050');
+      var pulse = 0.55 + 0.45 * Math.sin(G.t * 4);
+      g.save();
+      g.strokeStyle = 'rgba(255, 220, 110,' + (0.45 + pulse * 0.5) + ')'; g.lineWidth = 5;
+      g.beginPath(); g.ellipse(altarX, GY + 6, 86, 24, 0, 0, 6.283); g.stroke();
+      g.strokeStyle = 'rgba(255, 244, 190,' + (0.25 * pulse) + ')'; g.lineWidth = 2;
+      g.beginPath(); g.ellipse(altarX, GY + 6, 118, 34, 0, 0, 6.283); g.stroke();
+      g.restore();
+      ART.glow(g, altarX, GY - 90, 110, 'rgba(255, 210, 90,' + (0.35 + pulse * 0.3) + ')');
+      SPR.draw(g, 'props_9_30', 'yagnaAltar', altarX, GY + 6, { s: 0.72, cx: true });
+      SPR.draw(g, 'props_9_30', 'flameColumn', altarX, GY - 4, { s: 0.42 * (0.7 + altar / 220), cx: true, sy: 1 + Math.sin(G.t * 10) * 0.05 });
+      ART.bar(g, altarX - 46, GY - 188, 92, 10, altar / 100, altar < 40 ? '#ff6a4a' : '#ffb050');
+      ART.text(g, T('defendFlame'), altarX, GY - 204, { size: 15, align: 'center', gold: true, sw: 4 });
       foes.forEach(function (f) {
         if (f.dead) return;
         var fr = f.st === 'strike' || f.st === 'windup' ? (f.t === 'brute' ? 'bruteAtk' : 'raiderAtk') : ((f.t === 'brute' ? 'brute' : 'raider') + (Math.floor(G.t * 8) % 2));
-        if (f.t === 'brute' && f.hurt > 0.05) fr = 'bruteHurt';
+        if (f.t === 'brute' && f.st === 'stagger') fr = 'bruteHurt';
         if (f.st === 'windup') ART.text(g, '!', f.x, GY - 168, { size: 28, align: 'center', col: '#ff6a4a', sw: 4, bold: true });
         ART.shadow(g, f.x, GY, 40, 0.32);
-        SPR.draw(g, 'rakshasa', fr, f.x, GY + 4, { s: f.t === 'brute' ? 0.64 : 0.56, cx: true, face: f.face, tint: '#ffffff', tintA: f.hurt * (f.t === 'raider' ? 5 : 3) });
+        SPR.draw(g, 'rakshasa', fr, f.x, GY + 4, { s: f.t === 'brute' ? 0.64 : 0.56, cx: true, face: f.face, tint: '#ffe2a0', tintA: foeTint(f.hurt, f.t === 'raider') });
         ART.bar(g, f.x - 24, GY - 150, 48, 6, f.hp / f.max, '#e07050');
       });
       party.forEach(function (b, k) { if (k !== ai) drawHero(g, b, 0, { alpha: 0.95 }); });
@@ -1924,6 +1959,85 @@
     return M;
   }
 
+  // ---------------- PINAKA (L16): timed hold-and-release. A miss retries the phrase, never the campaign. ----------------
+  function PinakaMode(seg) {
+    var th = theme(seg.theme || 'hall'), M = { kind: 'pinaka', touch: 'hold', swipes: false, t: 0, done: false, fail: null };
+    var phases = seg.phases || [
+      { name: { en: 'Plant your feet', hi: 'पैर जमाओ' }, period: 1.25 },
+      { name: { en: 'Lift', hi: 'उठाओ' }, period: 1.15 },
+      { name: { en: 'String the bow', hi: 'प्रत्यंचा चढ़ाओ' }, period: 1.05 },
+      { name: { en: 'Draw', hi: 'खींचो' }, period: 1.05 }
+    ];
+    var phase = 0, period = phases[0].period, drawK = 0, held = false, t0 = 0.6, broken = false;
+    M.hero = { id: 'ramaA' };
+    G.tip = tr(seg.tips[0].t); G.tipT = 7;
+    banner(tr(phases[0].name), '', 1.6);
+    function beginPhase(i) { phase = i; period = phases[i].period; t0 = M.t + 0.45; drawK = 0; held = false; M.pulse = 0; M.lastBeat = -1; banner(tr(phases[i].name), (i + 1) + ' / ' + phases.length, 1.4); }
+    M.update = function (dt) {
+      M.t += dt;
+      var bt = M.t - t0, idx = Math.floor(bt / period);
+      if (!broken && bt >= 0 && idx !== M.lastBeat) { M.lastBeat = idx; AU.sfx('drum'); M.pulse = 1; }
+      M.pulse = Math.max(0, (M.pulse || 0) - dt * 3);
+      var h = IN.holdHeld();
+      if (h && !broken) drawK = Math.min(1, drawK + dt * 1.15);
+      if (held && !h && !broken && M.doneT == null) {
+        var ph = bt - Math.round(bt / period) * period, e = Math.abs(ph);
+        var res = drawK < 0.92 ? 'weak' : e <= 0.07 ? 'perfect' : e <= 0.13 ? 'good' : 'off';
+        M.last = { e: e, res: res };
+        if (res === 'perfect' || res === 'good') {
+          AU.sfx(res === 'perfect' ? 'perfect' : 'thunk');
+          if (res === 'perfect') G.stats.perfect++;
+          pop(W * 0.62, GY - 210, res === 'perfect' ? T('perfect') : T('beat'), '#ffe27a', 26, true);
+          sparks(W * 0.62, GY - 150, '#ffe0a0', 12);
+          if (phase + 1 >= phases.length) {
+            broken = true; M.doneT = 1.7; slowmo(0.7); flash(0.55, '255,230,160'); shake(10); AU.sfx('crack'); AU.sfx('aura');
+            banner(T('pinakaBreak'), '', 2); G.score += 1200;
+            ART.spawn('chip', W * 0.62, GY - 140, { n: 26, speed: 280, life: 0.9, r: 4, col: '#e8c080', g: 500, screen: true });
+          } else beginPhase(phase + 1);
+        } else {
+          G.stats.phaseMisses++; AU.sfx('miss'); banner(T('againSoft'), tr(phases[phase].name), 1.3);
+          pop(W * 0.62, GY - 210, res === 'weak' ? T('weak') : T('offBeat'), '#ffb0a0', 22, true);
+          t0 = M.t + 0.7; drawK = 0; M.lastBeat = -1;
+        }
+      }
+      if (!h && !held && !broken) drawK = Math.max(0, drawK - dt * 1.6);
+      held = h;
+      if (M.doneT != null) { M.doneT -= dt; if (M.doneT <= 0) M.done = true; }
+      M.bt = bt; M.drawK = drawK; M.held = held; M.phase = phase; M.period = period; M.broken = broken;
+      AU.setIntensity(0.35 + phase * 0.12);
+    };
+    M.ai = function (C) {
+      var bt = M.bt || 0, nb = Math.ceil((bt + 0.0001) / period) * period, toNext = nb - bt;
+      if (M.broken || M.doneT != null) { C.hold = false; return; }
+      if (bt < 0) { C.hold = true; return; }
+      if (M.aiRel) { C.hold = false; M.aiRel--; return; }
+      if (M.held && M.drawK >= 0.98 && toNext < 0.02) { C.hold = false; M.aiRel = 4; return; }
+      C.hold = true;
+    };
+    M.draw = function () {
+      ART.plate(g, th.plate, 0, 0, W, H, -16, 1.08);
+      ART.haze(g, W, H, th.haze, 0, 0.18, H * 0.35);
+      ART.groundBlock(g, th, -20, W + 20, GY, GY, H, 0);
+      var bx = W * 0.5, by = GY - 120, k = M.broken ? 1 : (phase / phases.length);
+      ART.glow(g, bx, by - 20, 70 + k * 90, 'rgba(255,210,100,' + (0.2 + (M.drawK || 0) * 0.45) + ')');
+      if (M.broken) { g.fillStyle = 'rgba(255,230,170,0.28)'; g.fillRect(0, 0, W, H); }
+      if (!M.broken && M.bt > 0) {
+        var ph = ((M.bt % period) + period) % period, ring = 1 - ph / period;
+        g.strokeStyle = 'rgba(255,230,160,0.9)'; g.lineWidth = 3;
+        g.beginPath(); g.arc(bx, by - 70, 18 + 80 * ring, 0, 6.283); g.stroke();
+        g.strokeStyle = '#fff4c0'; g.lineWidth = 4; g.beginPath(); g.arc(bx, by - 70, 16, 0, 6.283); g.stroke();
+      }
+      ART.drawParts(g, 0, false);
+      drawGrade(th);
+    };
+    M.hud = function () {
+      var nm = phases[Math.min(phase, phases.length - 1)];
+      ART.text(g, tr(nm.name) + '   ' + (phase + (M.broken ? 1 : 0)) + '/' + phases.length, W / 2, 78, { size: 18, align: 'center', gold: true });
+      ART.bar(g, W / 2 - 80, 90, 160, 8, M.drawK || 0, (M.drawK || 0) > 0.92 ? '#fff4a0' : '#ffb060');
+    };
+    return M;
+  }
+
   // ---------------- level flow ----------------
   function makeMode(seg) {
     if (!seg.theme) seg.theme = G.L.theme;
@@ -1936,10 +2050,11 @@
       case 'meditate': return MeditateMode(seg);
       case 'beat': return BeatMode(seg);
       case 'defend': return DefendMode(seg);
+      case 'pinaka': return PinakaMode(seg);
     }
     return StoryMode({ cast: [], lines: [{ who: 'narrator', en: '...', hi: '...' }], theme: seg.theme });
   }
-  function freshStats() { return { hits: 0, falls: 0, standards: 0, lotus: 0, perfect: 0, sparHits: 0, smash: 0, drillRetries: 0, wild: 0, trueShots: 0, breaks: 0, minSteady: 100, together: 0, bumps: 0, altarMin: 100, warning: 0, crowns: 0 }; }
+  function freshStats() { return { hits: 0, falls: 0, standards: 0, lotus: 0, perfect: 0, sparHits: 0, smash: 0, drillRetries: 0, wild: 0, trueShots: 0, breaks: 0, minSteady: 100, together: 0, bumps: 0, altarMin: 100, warning: 0, crowns: 0, phaseMisses: 0, boons: 0, accept: 0 }; }
   function startLevel(li, si) {
     G.li = li; G.L = LEVELS[li]; G.pips = 3; G.meter = 0; G.score = 0; G.stats = freshStats();
     G.day = G.L.dayTime || 0; G.focusLives = G.L.focusLives || 0; G.levelT = 0; G.segLog = [];
@@ -2190,7 +2305,7 @@
         if (!c.more) { var L = LEVELS[c.i], lk = heroLook(L.hero, false); SPR.draw(g, lk[0], lk[1], c.x + c.w * 0.74, yy + c.h + 4, { s: (c.h > 140 ? 0.4 : 0.3) * Math.min(1, lk[2]), face: -1 }); }
         g.restore();
         ART.rr(g, c.x, yy, c.w, c.h, 12); g.lineWidth = 2.5; g.strokeStyle = c.more ? '#b49aff' : '#e8b85a'; g.stroke();
-        if (c.more) { ART.text(g, '15 – 30', c.x + c.w / 2, yy + c.h * 0.4, { size: Math.max(16, Math.min(26, c.h * 0.2)), align: 'center', kind: 'title', gold: true, bold: true }); ART.text(g, T('goesOn'), c.x + c.w / 2, yy + c.h * 0.64, { size: 12, align: 'center' }); ART.text(g, T('soon'), c.x + c.w / 2, yy + c.h * 0.82, { size: 11, align: 'center', col: '#d8c8ff' }); }
+        if (c.more) { ART.text(g, (LEVELS.length + 1) + ' – 30', c.x + c.w / 2, yy + c.h * 0.4, { size: Math.max(15, Math.min(24, c.h * 0.2)), align: 'center', kind: 'title', gold: true, bold: true }); ART.text(g, T('goesOn'), c.x + c.w / 2, yy + c.h * 0.64, { size: 12, align: 'center' }); ART.text(g, T('soon'), c.x + c.w / 2, yy + c.h * 0.82, { size: 11, align: 'center', col: '#d8c8ff' }); }
         else {
           var L2 = LEVELS[c.i], locked = c.i >= SAVE.unlocked, best = SAVE.best[L2.n];
           ART.text(g, String(L2.n), c.x + 10, yy + 24, { size: c.h > 140 ? 26 : 18, kind: 'title', gold: true, bold: true });
@@ -2225,7 +2340,7 @@
     down: function (p) { if (inB(this.btn, p.x, p.y)) { AU.sfx('click'); setScene(SC.select); } },
     draw: function () {
       var t = this.t;
-      ART.plate(g, ART.img.bg14 ? 'bg14' : 'bg8', t * 6, 1, W, H, 0, 1.08);
+      ART.plate(g, ART.img.bg19 ? 'bg19' : 'bg14', t * 6, 1, W, H, 0, 1.08);
       var gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, 'rgba(12,6,16,0.25)'); gr.addColorStop(0.45, 'rgba(12,6,16,0.55)'); gr.addColorStop(1, 'rgba(8,4,10,0.82)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
       ART.drawParts(g, 0, true);
       ART.glow(g, W * 0.5, H * 0.42, 220, 'rgba(255,200,110,0.28)');
@@ -2378,7 +2493,7 @@
       var y = 232;
       L.stars.forEach(function (s, j) { var ok = j === 0 || (j === 1 ? R.s2 : R.s3); ART.text(g, (ok ? '✓ ' : '✗ ') + tr(s), 54, y + j * 26, { size: 16, col: ok ? '#bfffc0' : '#ffb0a0' }); });
       var st = G.stats, rows = [];
-      var show = { standards: 'War-standards', lotus: 'Hidden lotus', falls: 'Falls', hits: 'Hits taken', perfect: 'Perfect shots', sparHits: 'Spar hits taken', smash: 'Smashed / cleared', drillRetries: 'Drill retries', wild: 'Wild shots', trueShots: 'True shots', breaks: 'Focus breaks', minSteady: 'Lowest steadiness', together: 'Together hits', altarMin: 'Sacrifice fire', warning: 'Warning heard', crowns: 'Crowns kindled' };
+      var show = { standards: 'War-standards', lotus: 'Hidden lotus', falls: 'Falls', hits: 'Hits taken', perfect: 'Perfect shots', sparHits: 'Spar hits taken', smash: 'Smashed / cleared', drillRetries: 'Drill retries', wild: 'Wild shots', trueShots: 'True shots', breaks: 'Focus breaks', minSteady: 'Lowest steadiness', together: 'Together hits', altarMin: 'Sacrifice fire', warning: 'Warning heard', crowns: 'Crowns kindled', phaseMisses: 'Mistimed lifts', boons: 'Boons heard', accept: 'Rama accepts' };
       [L.star2.stat, L.star3.stat].forEach(function (k2) { rows.push((SAVE.lang === 'hi' ? k2 : show[k2]) + ': ' + st[k2]); });
       ART.text(g, rows.join('    '), 54, y + 92, { size: 15, col: '#ffe0b0' });
       ART.text(g, T('score') + ': ' + R.score + (R.newBest ? '   ★ ' + T('best') + '!' : '   (' + T('best') + ' ' + R.best.score + ')'), 54, y + 126, { size: 22, gold: true });

@@ -45,8 +45,13 @@ Every asset is embedded in `js/assets.js`, so the game also runs from `file://`.
 12. Tataka: a fixed-screen bout. Vishvamitra steadies Rama; the sage does not draw the bow.
 13. Protecting the Sacrifice: walk to the altar, hold it against the host, then face Subahu. Maricha is cast far, not slain.
 14. Journey to Mithila: a runner along the road to Janaka's gates.
+15. Swayamvara Approach: cross the hall, speak with Janaka and Sita, and reach the Pinaka.
+16. Lifting the Pinaka: four timed phrases. A miss retries that phrase. The bow breaks.
+17. Parashurama Encounter: a short clash that ends when he recognises Rama and departs. He is not killed.
+18. Kaikeyi's Demand: Manthara's whisper, then the court. Rama hears the two boons and accepts them.
+19. Leaving Ayodhya: the city follows the three to the gate, then a gentle road opens.
 
-After level 14 the game shows a "to be continued" card. Levels 15–30 stay listed in the chronicle (`js/levels2.js`) until the next batch. Painted art for 9–14 loads from `js/assets2.js` after the opening eight, so levels 1–8 still start on the original file.
+After level 19 the game shows a "to be continued" card. Levels 20–30 stay listed in the chronicle (`js/levels2.js`). Painted art for 9–19 loads from `js/assets2.js` after the opening eight, so levels 1–8 still start on the original file.
 
 ## Structure
 ```
@@ -56,8 +61,8 @@ js/audio.js    WebAudio: Indian-classical procedural score (tanpura, tabla, bans
 js/art.js      parallax plates, scenery layers, textured ground, particles, weather, fog, glow, UI widgets
 js/sprites.js  atlas drawing (feet anchors, flip, tint, portraits)
 js/levels.js   levels 1–8 as data (bilingual EN/HI)
-js/levels2.js  playable levels 9–14; titles for 15–30
-js/assets2.js  lazy-loaded plates and sprites for levels 9–14
+js/levels2.js  playable levels 9–19; titles for 20–30
+js/assets2.js  lazy-loaded plates and sprites for levels 9–19
 js/game.js     loop, input, physics, the six play modes, menus, save, demo autopilot, test hooks
 tools/test_levels_9_14.js  Playwright: autopilot levels 9–14, smoke 1 and 8, screenshots
 ```
