@@ -78,8 +78,8 @@
     for (var i = -1; i < 3; i++) {
       var x = i * pw - off; if (x > W || x + pw < 0) continue;
       var k = ((i % 2) + 2) % 2;
-      if (k === 1) { g.save(); g.translate(x + pw, y); g.scale(-1, 1); g.drawImage(im, 0, 0, pw, ph); g.restore(); }
-      else g.drawImage(im, x, y, pw, ph);
+      if (k === 1) { g.save(); g.translate(x + pw, y); g.scale(-1, 1); g.drawImage(im, -2, 0, pw + 4, ph); g.restore(); }
+      else g.drawImage(im, x - 2, y, pw + 4, ph);
     }
   };
   // a layer of scenery sprites at a parallax factor (deterministic per index)

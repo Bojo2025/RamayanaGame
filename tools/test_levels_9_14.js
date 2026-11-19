@@ -100,6 +100,44 @@ async function play(page, wallMs) {
     await b.page.close();
   }
 
+  // Regression: story stats count again on a second play, retry restores pickups, Enter continues.
+  const reg = await boot(browser, 30, { viewport: desktop, touch: false });
+  let st = await play(reg.page, 40000);
+  if (st.scene !== 'complete') throw new Error('L30 first play did not complete');
+  const firstVow = st.stats.vow, firstSouth = st.stats.south;
+  if (!firstVow || !firstSouth) throw new Error('L30 first play missing story stats ' + firstVow + ' ' + firstSouth);
+  st = await reg.page.evaluate(() => { window.__rpd.advance(0.8); window.__rpd.press('confirm'); return window.__rpd.advance(0.4); });
+  if (st.scene !== 'credits') throw new Error('Enter on the completion card did not continue: ' + st.scene);
+  await reg.page.evaluate(() => window.__rpd.startLevel(30, 0));
+  st = await play(reg.page, 40000);
+  if (st.scene !== 'complete') throw new Error('L30 replay did not complete');
+  if ((st.stats.vow || 0) < 1 || (st.stats.south || 0) < 1) throw new Error('L30 replay dropped story stats ' + JSON.stringify(st.stats));
+  report.push({ level: 30, viewport: 'regress', scene: 'ok', what: 'replay-stats', vow: st.stats.vow, south: st.stats.south, errors: reg.errors.slice() });
+  await reg.page.close();
+
+  const ret = await boot(browser, 1, { viewport: desktop, touch: false });
+  let mid;
+  for (let i = 0; i < 400; i++) {
+    mid = await ret.page.evaluate(() => window.__rpd.advance(0.4));
+    if ((mid.stats.standards || 0) >= 1 && mid.score > 100) break;
+  }
+  if ((mid.stats.standards || 0) < 1) throw new Error('could not collect a war-standard');
+  let over = await ret.page.evaluate(() => { window.__rpd.forceFail(); return window.__rpd.advance(0.3); });
+  if (over.scene !== 'over') throw new Error('Try Again screen did not open');
+  let back = await ret.page.evaluate(() => { window.__rpd.advance(0.4); window.__rpd.press('confirm'); return window.__rpd.advance(0.3); });
+  if (back.scene !== 'play' || back.seg !== mid.seg) throw new Error('Enter on Not Yet did not restart the section');
+  if ((back.stats.standards || 0) !== 0 || back.score >= mid.score) throw new Error('retry kept score/stats ' + back.score + ' ' + back.stats.standards);
+  report.push({ level: 1, viewport: 'regress', scene: 'ok', what: 'retry-reset', errors: ret.errors.slice() });
+  await ret.page.close();
+
+  const fly = await boot(browser, 29, { viewport: desktop, touch: false, seg: 1 });
+  over = await fly.page.evaluate(() => { window.__rpd.forceFail(); return window.__rpd.advance(0.3); });
+  if (over.scene !== 'over') throw new Error('L29 Not Yet did not open');
+  back = await fly.page.evaluate(() => { window.__rpd.advance(0.4); window.__rpd.press('confirm'); return window.__rpd.advance(0.3); });
+  if (back.scene !== 'play') throw new Error('Enter on L29 Not Yet did not restart: ' + back.scene);
+  report.push({ level: 29, viewport: 'regress', scene: 'ok', what: 'enter-retry', errors: fly.errors.slice() });
+  await fly.page.close();
+
   await browser.close();
   fs.writeFileSync(path.join(OUT, 'report.json'), JSON.stringify(report, null, 2));
   const bad = report.filter((r) => (r.errors && r.errors.length) || r.scene === 'over' || (r.level >= 9 && r.viewport === 'desktop' && r.scene !== 'complete'));

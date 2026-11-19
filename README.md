@@ -1,4 +1,4 @@
-# Ramayana · Path of Dharma (levels 1–14)
+# Ramayana · Path of Dharma (levels 1–30)
 
 **Developed by Mr Boyjonauth Kevin · Bojo Solutions**
 

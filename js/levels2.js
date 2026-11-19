@@ -1,5 +1,5 @@
 // RAMAYANA: PATH OF DHARMA - levels 9-14 (message 194, the linear telling after the childhood interleave).
-// Levels 15-30 stay listed, not yet playable. Wording is original, after the public-domain Valmiki Ramayana.
+// Levels 9-30 are playable. Wording is original, after the public-domain Valmiki Ramayana.
 (function () {
   'use strict';
   function L(en, hi) { return { en: en, hi: hi }; }
@@ -264,7 +264,7 @@
         plats: [{ x: 1880, y: 378, w: 150, k: 'daisSteps' }],
         items: [{ t: 'lotus', x: 1955, y: 378, hidden: true }],
         npcs: [
-          { id: 'janaka', x: 1860, face: -1, key: 'janaka', lines: D([
+          { id: 'janaka', x: 1620, face: -1, key: 'janaka', lines: D([
             ['janaka', 'The other princes have looked, and they have sat down again. I will not shame them by naming the weight.', 'दूसरे राजकुमार देख चुके हैं, और फिर बैठ गए हैं। मैं उस भार का नाम लेकर उन्हें लज्जित नहीं करूँगा।'],
             ['ramaA', 'A bow is only heavy to the hand that is arguing with it.', 'धनुष केवल उस हाथ के लिए भारी है जो उससे झगड़ा कर रहा हो।'],
             ['janaka', 'Then walk on. My daughter stands by the dais. The bow is beyond her, and it is not hidden.', 'तो आगे बढ़ो। मेरी पुत्री वेदिका के पास खड़ी है। धनुष उसके आगे है, और वह छिपा नहीं है।']
@@ -275,7 +275,7 @@
             ['sitaStory', 'The bow is there. I will not tell you what to do with it. I will watch.', 'धनुष वहाँ है। मैं तुम्हें नहीं बताऊँगी कि उसके साथ क्या करना है। मैं देखूँगी।']
           ]) }
         ],
-        decor: [{ k: 'pillarLotus', sh: 'terrain_9_30', x: 420, s: 0.7 }, { k: 'vessels', sh: 'props_9_30', x: 700, s: 0.45 }, { k: 'goldLotus', sh: 'props_9_30', x: 2100, s: 0.4 }],
+        decor: [{ k: 'pillarLotus', sh: 'terrain_9_30', x: 420, s: 0.7 }, { k: 'vessels', sh: 'props_9_30', x: 700, s: 0.45 }, { k: 'goldLotus', sh: 'props_9_30', x: 2480, s: 0.4 }],
         checkpoints: [60, 1300, 2300],
         tips: [{ x: 40, t: L('The bow stays on its dais. Walk the floor in front of it. Speak with Janaka, then with Sita.', 'धनुष अपनी वेदिका पर रहता है। उसके आगे की भूमि पर चलो। पहले जनक से, फिर सीता से बात करो।') },
           { x: 1100, t: L('The gap is in the floor, not on the bow. One jump, or two if you hesitate. A lotus sits on the low step.', 'खाई भूमि में है, धनुष पर नहीं। एक छलांग, या हिचकिचाओ तो दो। नीची सीढ़ी पर एक कमल है।') }],
@@ -306,7 +306,7 @@
           { name: L('String the bow', 'प्रत्यंचा चढ़ाओ'), period: 1.08 },
           { name: L('Draw', 'खींचो'), period: 1.05 }
         ],
-        tips: [{ t: L('HOLD to build the draw. RELEASE on the drum, when the ring closes on the bow. A miss retries only that phrase.', 'खींचने के लिए दबाए रखो। ढोल की थाप पर छोड़ो, जब वलय धनुष पर सिमटे। चूक केवल उसी चरण को दोहराती है।') }] },
+        tips: [{ t: L('HOLD until the bar is full, about three seconds. Then RELEASE when the ring closes on the bow. A miss retries only that phrase.', 'पट्टी भरने तक दबाए रखो, लगभग तीन क्षण। फिर वलय के धनुष पर सिमटने पर छोड़ो। चूक केवल उसी चरण को दोहराती है।') }] },
       { type: 'story', theme: 'hall', cast: [{ id: 'ramaStory', x: 0.34, face: 1, s: 1.02, fr: 'triumph' }, { id: 'sitaStory', x: 0.68, face: -1, s: 1.02, fr: 'folded' }],
         lines: D([
           ['narrator', 'The bow breaks. Not as a failure. As a sound the hall had never been allowed to hear. Gold light stays in the air a moment longer than the wood.', 'धनुष टूटता है। असफलता की तरह नहीं। एक ऐसी ध्वनि की तरह जिसे सभागृह को सुनने की अनुमति कभी नहीं थी। स्वर्ण प्रकाश लकड़ी से एक क्षण अधिक हवा में रहता है।'],
@@ -535,18 +535,18 @@
           Line('sitaA', 'You may drink water. You may sit. You may not shop for my husband as if he were a garland.', 'तुम जल पी सकती हो। बैठ सकती हो। मेरे पति को माला की तरह नहीं चुन सकतीं।', { pose: { sitaA: 'idle', shurpa: 'angry' } }),
           Line('shurpa', 'A wife who speaks. How small a kingdom this hut is. Keep him, then. The woods will not stay this polite.', 'एक पत्नी जो बोलती है। यह कुटिया कितना छोटा राज्य है। तो उसे रखो। वन इतना विनम्र नहीं रहेगा।', { pose: { shurpa: 'turnAway' } })
         ] },
-      { type: 'platform', hero: 'ramaA', partner: 'lakA', theme: 'panch', len: 2400, music: 'play',
-        ground: [[0, 900], [1120, 2400]],
-        plats: [{ x: 980, y: 360, w: 140, k: 'logBridge' }],
+      { type: 'platform', hero: 'ramaA', partner: 'lakA', theme: 'panch', len: 2700, music: 'play',
+        ground: [[0, 1040], [1240, 2500]],
+        plats: [{ x: 1100, y: 360, w: 180, k: 'logBridge' }],
         foes: [{ t: 'raider', x: 1600, hp: 3 }],
         decor: [{ k: 'bamboo', sh: 'scenery_9_30', x: 400, s: 0.65 }, { k: 'fern', sh: 'scenery_9_30', x: 1700, s: 0.5 }],
         checkpoints: [60, 1200],
-        tips: [{ x: 40, t: L('She has left the hut. Follow the path. The gap is only a gap. One raider is only a raider.', 'वह कुटिया छोड़ चुकी है। पथ पर चलो। खाई केवल खाई है। एक राक्षस केवल एक राक्षस है।') }],
-        npcs: [{ id: 'shurpa', x: 2000, face: -1, key: 'shurpa', lines: [
+        tips: [{ x: 40, t: L('The log is the step across the gap. A second jump in the air clears it if you miss. Then speak with her: the ! marks who must be heard.', 'लकड़ी खाई का पुल है। चूको तो हवा में दूसरी छलांग पार कराती है। फिर उससे बात करो: ! बताता है किसे सुनना है।') }],
+        npcs: [{ id: 'shurpa', x: 2180, face: -1, key: 'shurpa', lines: [
           Line('shurpa', 'Tell your brother with the sword that I am not finished. I am going where my brothers can hear a complaint.', 'अपने तलवार वाले भाई से कहना कि मैं समाप्त नहीं हुई। मैं वहाँ जा रही हूँ जहाँ मेरे भाई एक शिकायत सुन सकें।', { pose: { shurpa: 'angry' } }),
           Line('ramaA', 'Go, then. Do not come back to this fire with a crowd.', 'तो जाओ। इस अग्नि पर भीड़ लेकर मत लौटना।', { pose: { shurpa: 'turnAway' } })
         ] }],
-        goal: { x: 2260, k: 'mark', need: ['shurpa'],
+        goal: { x: 2360, k: 'mark', need: ['shurpa'],
           blocked: L('She is still on the path. Hear her last words.', 'वह अभी पथ पर है। उसके अंतिम शब्द सुनो।') } }
     ]
   });
@@ -597,7 +597,7 @@
       { type: 'runner', hero: 'ramaA', theme: 'deer', len: 11000, speed: 400, speedMax: 460, seed: 25, music: 'play', chase: 'deer', deerAt: 2600,
         cry: L('A cry, in a voice like yours. It sits wrong.', 'एक पुकार, तुम्हारे स्वर जैसी। वह ठीक नहीं बैठती।'),
         phases: [
-          { until: 4200, set: ['gap', 'branch', 'rock'], name: L('The gold ahead', 'आगे का सोना') },
+          { until: 4200, set: ['gap', 'rock'], name: L('The gold ahead', 'आगे का सोना') },
           { until: 10400, set: ['branch', 'gap', 'rock'], name: L('Loose the arrow', 'बाण छोड़ो') }
         ],
         tips: [{ x: 40, t: L('Keep it in front of you. Slide the branches. When its life shows, shoot. Do not let the voice decide for you.', 'उसे अपने आगे रखो। डालियों के नीचे फिसलो। जब उसका जीवन दिखे, बाण छोड़ो। स्वर को अपने लिए निर्णय मत करने देना।') }],
@@ -627,7 +627,7 @@
           Line('narrator', 'Later tellings remember a line in the dust. This one does too. A boundary, asked of a guest, not a prison asked of a wife.', 'बाद की कथाएँ धूल में एक रेखा याद रखती हैं। यह कथा भी। एक सीमा, अतिथि से माँगी हुई, न कि पत्नी के लिए एक कारागार।', { pose: { lakStory: 'drawLine' }, stat: 'line' })
         ] },
       { type: 'platform', hero: 'lakA', theme: 'panch', len: 1800, music: 'play',
-        ground: [[0, 700], [920, 1800]],
+        ground: [[0, 1100], [1320, 1800]],
         npcs: [{ id: 'sitaA', x: 480, face: 1, key: 'sita', lines: D([
           ['sitaA', 'The line is ahead of you, not behind me. Draw it, say the words, and go. I know which side of it is mine.', 'रेखा तुम्हारे आगे है, मेरे पीछे नहीं। उसे खींचो, शब्द कहो, और जाओ। मैं जानती हूँ उसका कौन सा पार मेरा है।'],
           ['lakA', 'Do not cross it for kindness. Kindness is what a trick asks for first.', 'दया के लिए इसे मत लाँघना। दया वह है जो छल सबसे पहले माँगता है।']
@@ -663,13 +663,13 @@
         ] },
       { type: 'platform', hero: 'sitaA', theme: 'panchNight', len: 1500, noAttack: true, music: 'calm',
         ground: [[0, 1500]],
-        npcs: [{ id: 'guest', x: 1180, face: -1, key: 'guest', lines: [
+        npcs: [{ id: 'guest', x: 1280, face: -1, key: 'guest', lines: [
           Line('guest', 'The alms, and nothing else. I am only hungry.', 'भिक्षा, और कुछ नहीं। मैं केवल भूखा हूँ।', { pose: { guest: 'alms' } }),
           Line('sitaA', 'Then I bring it across. Remember, afterwards, that I came as a host, not as a prize.', 'तो मैं इसे पार ले आती हूँ। बाद में याद रखना कि मैं एक गृहस्वामिनी बनकर आई, इनाम बनकर नहीं।')
         ] }],
         checkpoints: [40],
-        tips: [{ x: 30, t: L('Walk to the line and past it. You cannot stay on this side and finish the chapter. That is the point of it.', 'रेखा तक चलो, और उसके पार। तुम इस पार रहकर अध्याय पूरा नहीं कर सकतीं। बात ही यही है।') }],
-        goal: { x: 1360, k: 'line', need: ['guest'],
+        tips: [{ x: 30, t: L('The line will not open until you have spoken with the ascetic. The ! is him. Then step over.', 'रेखा तब तक नहीं खुलेगी जब तक तपस्वी से बात न हो। ! वही है। फिर पार कदम रखो।') }],
+        goal: { x: 1480, k: 'line', need: ['guest'],
           blocked: L('He is waiting. Hear him before you cross.', 'वह प्रतीक्षा कर रहा है। पार जाने से पहले उसे सुनो।'),
           line: D([['sitaA', 'I step over the line with the food in my hands. Let the forest witness that I did it for a guest.', 'मैं अन्न हाथों में लिए रेखा के पार कदम रखती हूँ। वन गवाह रहे कि मैंने यह एक अतिथि के लिए किया।']]) } },
       { type: 'story', theme: 'panchNight', cast: [{ id: 'guest', x: 0.34, face: 1, s: 1.05, fr: 'seize' }, { id: 'sitaStory', x: 0.68, face: -1, s: 1.0, fr: 'frightened' }],

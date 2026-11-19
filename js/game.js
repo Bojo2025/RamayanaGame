@@ -34,8 +34,10 @@
   })();
   if (Q.get('unlock') === '1') SAVE.unlocked = 30;
   if (Q.get('lang') === 'hi') SAVE.lang = 'hi';
-  function persist() { store.set('rpd_save_v1', SAVE); }
-  persist();
+  // Autopilot and the unlock flag must not overwrite a player's real save.
+  var NO_SAVE = Q.get('unlock') === '1' || Q.get('demo') === '1' || Q.get('capture') === '1';
+  function persist() { if (NO_SAVE) return; store.set('rpd_save_v1', SAVE); }
+  if (!NO_SAVE) persist();
   AU.setMuted(SAVE.mute);
 
   // ---------------- language ----------------
@@ -67,7 +69,7 @@
     objJanaka: ['Janaka', 'जनक'], objSita: ['Sita', 'सीता'], objShurpa: ['Shurpanakha', 'शूर्पणखा'], objGuest: ['The guest', 'अतिथि'],
     bird: ['The bird!', 'पक्षी!'], ignore: ['Ignore the shout!', 'शोर अनसुना करो!'], markReset: ['Out of arrows: the mark resets', 'बाण समाप्त: निशान फिर से'], best: ['Best', 'सर्वश्रेष्ठ'],
     continued: ['To be continued', 'आगे की कथा'], moreChapters: ['More chapters are being painted', 'आगे के अध्याय चित्रित हो रहे हैं'],
-    soonBody: ['The vow is made. The road south is open, and it is not a short one.', 'प्रतिज्ञा हो चुकी है। दक्षिण का मार्ग खुला है, और वह छोटा नहीं है।'],
+    soonBody: ['The road south is open, and it is not a short one.', 'दक्षिण का मार्ग खुला है, और वह छोटा नहीं है।'],
     credits: ['Credits', 'आभार'],
     theEnd: ['The vow is made', 'प्रतिज्ञा हो चुकी'],
     heard: ['Far to the south, someone has already heard it.', 'दूर दक्षिण में, किसी ने इसे पहले ही सुन लिया है।'],
@@ -486,7 +488,13 @@
     lastDlgBox = { x: bx, y: by, w: bw, h: bh };
     ART.panel(g, bx, by, bw, bh, { r: 18 });
     var tx = bx + 26;
-    if (who.sh) {
+    if (who.sh === 'golden_deer') {
+      g.save(); g.beginPath(); g.arc(bx + 70, by + 64, 48, 0, 6.283); g.fillStyle = '#f0c86a'; g.fill(); g.clip();
+      SPR.draw(g, who.sh, who.fr || 'maricha', bx + 70, by + 100, { s: 0.28, cx: true });
+      g.restore();
+      g.beginPath(); g.arc(bx + 70, by + 64, 48, 0, 6.283); g.lineWidth = 3; g.strokeStyle = '#f2cf6a'; g.stroke();
+      tx = bx + 136;
+    } else if (who.sh) {
       var pc = SPR.portrait(who.sh, who.fr, who.sh === 'npc' ? 0.26 : 0.3);
       if (pc) {
         g.save(); g.beginPath(); g.arc(bx + 70, by + 64, 48, 0, 6.283); g.fillStyle = 'rgba(255,220,160,0.18)'; g.fill(); g.clip();
@@ -512,8 +520,8 @@
     function applyLine() {
       var ln = dlg.cur(); if (!ln || dlg.done) return;
       if (ln.pose) actors.forEach(function (a) { if (ln.pose[a.id]) a.fr = ln.pose[a.id]; });
-      if (ln.stat && !ln._st) { ln._st = 1; G.stats[ln.stat] = (G.stats[ln.stat] || 0) + 1; }
-      if (ln.fx && !ln._fx) { ln._fx = 1; flash(0.62, '255,226,160'); slowmo(0.55); AU.sfx('aura'); banner(ln.fx === 'crowns' ? (SAVE.lang === 'hi' ? 'मुकुट जागते हैं' : 'The crowns kindle') : '', '', 2.2); }
+      if (ln.stat && ln._runCounted !== G.runId) { ln._runCounted = G.runId; G.stats[ln.stat] = (G.stats[ln.stat] || 0) + 1; }
+      if (ln.fx && ln._fxRun !== G.runId) { ln._fxRun = G.runId; flash(0.62, '255,226,160'); slowmo(0.55); AU.sfx('aura'); banner(ln.fx === 'crowns' ? (SAVE.lang === 'hi' ? 'मुकुट जागते हैं' : 'The crowns kindle') : '', '', 2.2); }
     }
     function nextSpeaker() { var ln = seg.lines[dlg.i + 1]; if (!ln) return null; for (var i = 0; i < actors.length; i++) if (actors[i].id === ln.who) return actors[i]; return null; }
     function box(a) { var r = SPR.size(a.sh, a.fr); return [a.x - 80, a.y - r.h * a.s * 0.95, a.x + 80, a.y]; }
@@ -638,8 +646,13 @@
         if (n === 3) ART.spawn('ring', h.x + h.face * 40, h.y - 92, { r: 14, life: 0.5, col: 'rgba(255,230,160,0.9)', speed: 0 });
       }
     }
-    function talkable() { var h = active(); for (var i = 0; i < npcs.length; i++) if (!npcs[i].talked && Math.abs(npcs[i].x - h.x) < 130) return npcs[i]; return null; }
-    function openTalk(n) { dlg = new Dialog(n.lines, function () { n.talked = true; flags[n.key] = true; dlg = null; }); }
+    function talkable() { var h = active(); for (var i = 0; i < npcs.length; i++) if (!npcs[i].talked && Math.abs(npcs[i].x - h.x) < 240) return npcs[i]; return null; }
+    function openTalk(n) {
+      var h = active();
+      if (h && Math.abs(h.x - n.x) < 96) h.x = n.x + (h.x <= n.x ? -110 : 110);
+      if (h) { h.vx = 0; h.vy = 0; }
+      dlg = new Dialog(n.lines, function () { n.talked = true; flags[n.key] = true; dlg = null; });
+    }
     function goalNeeds() {
       var goal = seg.goal; if (!goal) return true;
       if (goal.need) for (var i = 0; i < goal.need.length; i++) if (!flags[goal.need[i]]) return false;
@@ -655,7 +668,7 @@
     M.drillFail = function (msg) { if (DEMO && seg.drill) { G.stats.drillRetries++; M.restart = true; return; } M.restart = true; G.stats.drillRetries++; banner(msg || T('drillFail'), tr(seg.drillName), 1.8); };
     M.update = function (dt) {
       M.t += dt;
-      if (dlg) { dlg.update(dt); if (consumeAdvance()) dlg.advance(); return; }
+      if (dlg) { var hf = active(); if (hf) { hf.vx = 0; hf.vy = 0; } dlg.update(dt); if (consumeAdvance()) dlg.advance(); return; }
       if (M.endDlg) { M.endDlg.update(dt); if (consumeAdvance()) M.endDlg.advance(); if (M.doneT != null) { M.doneT -= dt; if (M.doneT <= 0) M.done = true; } return; }
       // tag (L8)
       if (party.length > 1 && IN.tagP()) { ai = 1 - ai; AU.sfx('click'); pop(active().x, active().y - 170, whoName(active().id), '#fff2c0', 20); ART.spawn('ring', active().x, active().y - 60, { r: 12, life: 0.4, col: 'rgba(255,240,180,0.9)', speed: 0 }); }
@@ -676,7 +689,10 @@
       });
       // controls
       var mx = IN.mx(), jp = IN.jumpP(), jh = IN.jumpHeld(), dp = IN.downP();
-      if (goalT <= 0 && seg.goal && !goalNeeds() && h.x > seg.goal.x - 60 && mx > 0) { mx = 0; if (!M.blockPop || M.t - M.blockPop > 2.5) { M.blockPop = M.t; pop(h.x, h.y - 170, tr(seg.goal.blocked) || '…', '#ffe0b0', 18); } }
+      if (goalT <= 0 && seg.goal && !goalNeeds() && h.x > seg.goal.x - 110) {
+        mx = 0;
+        if (!M.blockPop || M.t - M.blockPop > 2.2) { M.blockPop = M.t; G.tip = tr(seg.goal.blocked) || '…'; G.tipT = 3.2; }
+      }
       var inPool = false, sg = segAt(w, h.x); if (sg && sg.k === 'pool' && h.gr) inPool = true;
       physHero(h, dt, w, { mx: mx, jumpP: jp, jumpHeld: jh, downP: dp, slow: inPool ? 0.55 : 1, minX: 20, maxX: len - 20 });
       if (seg.goal && !goalNeeds()) h.x = Math.min(h.x, seg.goal.x - 20);
@@ -933,6 +949,7 @@
       if (lift > 0.5) { var hz = th.haze || [140, 170, 200]; g.fillStyle = 'rgb(' + hz[0] + ',' + hz[1] + ',' + hz[2] + ')'; g.fillRect(0, 0, W, H); }
       g.save(); g.translate(0, lift);
       drawBackdrop(th, cam, { par: seg.bgPar, yoff: seg.bgY, zoom: seg.bgZoom, noMid: seg.noMid, hazeA: seg.hazeA });
+      if ((seg.bgZoom || 0) > 1.3) { g.fillStyle = th.top || '#d8c49a'; g.fillRect(-40, GY - 36, W + 80, 42); }
       // goal behind world
       drawGoal(seg.goal, cam, goalNeeds());
       // decor
@@ -948,7 +965,7 @@
       // items / npcs / dogs / targets / wilds
       items.forEach(function (it) { if (it.got) return; var x = it.x - cam, y = it.y - 34 + Math.sin(G.t * 3 + it.bob) * 5; ART.glow(g, x, y, 60, 'rgba(255,220,140,0.55)'); SPR.drawC(g, 'prop', it.t === 'standard' ? 'standard' : 'lotus', x, y - 10, { s: it.t === 'standard' ? 0.42 : 0.3 }); });
       npcs.forEach(function (n) { var x = n.x - cam; if (x < -200 || x > W + 200) return; ART.shadow(g, x, GY, 40, 0.35); SPR.draw(g, n.sh, n.fr, x, GY + 2, { s: 0.56, face: n.face, sy: 1 + Math.sin(G.t * 2 + n.x) * 0.01 });
-        if (!n.talked) { var near = Math.abs(n.x - active().x) < 130, by = GY - 200 + Math.sin(G.t * 4) * 5; ART.glow(g, x, by, 40, 'rgba(255,220,120,0.6)'); g.fillStyle = '#ffe27a'; g.beginPath(); g.arc(x, by, near ? 16 : 11, 0, 6.283); g.fill(); ART.text(g, near ? T('talk') : '…', x, by + 5, { size: near ? 13 : 14, align: 'center', col: '#3a1404', stroke: false, bold: true }); } });
+        if (!n.talked) { var must = seg.goal && seg.goal.need && seg.goal.need.indexOf(n.key) >= 0, near = Math.abs(n.x - active().x) < 240, by = GY - 210 + Math.sin(G.t * 4) * 5; if (must) ART.text(g, '!', x, GY - 248, { size: 26, align: 'center', col: '#ffe27a', sw: 4, bold: true }); ART.glow(g, x, by, 40, 'rgba(255,220,120,0.6)'); g.fillStyle = '#ffe27a'; g.beginPath(); g.arc(x, by, near ? 16 : 11, 0, 6.283); g.fill(); ART.text(g, near ? T('talk') : '…', x, by + 5, { size: near ? 13 : 14, align: 'center', col: '#3a1404', stroke: false, bold: true }); } });
       dogs.forEach(function (d) { var x = d.x - cam, bob = d.st === 'awake' ? Math.abs(Math.sin(G.t * 12)) * 6 : 0; SPR.draw(g, 'terr', 'dog', x, GY + 4 - bob, { s: 0.42, cx: true, face: -1 });
         if (d.st === 'sleep') ART.text(g, 'z', x + 30 + Math.sin(G.t * 2) * 6, GY - 70 - (d.t * 12 % 30), { size: 22, col: '#fff', sw: 3 }); else ART.text(g, '!', x + 20, GY - 90, { size: d.st === 'awake' ? 40 : 26, col: d.st === 'awake' ? '#ff6a4a' : '#ffe27a', sw: 5, bold: true }); });
       targets.forEach(function (t) { if (t.dead && !t.dummy) return; drawTarget(t, cam); });
@@ -1157,10 +1174,12 @@
     }
     if (seg.fixed) seg.fixed.forEach(function (f) { addObs(f.t, f.x, f.w); });
     if (seg.phases) {
-      var x = 1400, pi = 0;
+      var x = seg.lead || 2400, pi = 0, firstHaz = true;
       while (x < (seg.cave || len) - 1200) {
         while (pi < seg.phases.length - 1 && x > seg.phases[pi].until) pi++;
         var set = seg.phases[pi].set, t = set[Math.floor(rnd() * set.length)];
+        if (firstHaz && (t === 'branch' || t === 'boulder' || t === 'fall' || t === 'eagle')) t = 'gap';
+        firstHaz = false;
         var windy = (seg.wind || []).some(function (z) { return x > z[0] - 400 && x < z[1]; });
         if (t === 'gap') addObs('gap', x, windy ? RR(140, 180) : RR(150, 240));
         else addObs(t, x, 0);
@@ -1174,8 +1193,8 @@
       deer = { t: 'deer', x: 800, hp: 3, max: 3, dead: false, passed: false, ph: 0, w: 110, h: 120, reveal: 0, guard: seg.deerAt || 2200 };
       obs.push(deer);
     }
-    if (seg.ornaments) {
-      for (var jx = 1100; jx < len - 500; jx += seg.ornamentGap || 780) jewels.push({ x: jx, y: GY - 70, got: false });
+      if (seg.ornaments) {
+      for (var jx = 1600; jx < len - 500; jx += seg.ornamentGap || 780) jewels.push({ x: jx, y: GY - 96, got: false });
     }
     var w = { segs: [], plats: plats.map(function (p) { return { x: p.x, y: p.y, w: p.w, k: 'ledgeRock' }; }), solids: [] };
     var cx = 0; gaps.forEach(function (gp) { w.segs.push({ x0: cx, x1: gp[0], y0: GY, y1: GY }); cx = gp[1]; }); w.segs.push({ x0: cx, x1: len + W + 400, y0: GY, y1: GY });
@@ -1282,7 +1301,7 @@
       G.score += dt * 10;
       jewels.forEach(function (j) {
         if (j.got) return;
-        if (Math.abs(hero.x - j.x) < 36 && Math.abs(hero.y - j.y) < 80) { j.got = true; G.stats.jewels = (G.stats.jewels || 0) + 1; G.score += 80; AU.sfx('lotus'); pop(j.x, j.y - 20, '+', '#ffe27a', 18); }
+        if (Math.abs(hero.x - j.x) < 48 && Math.abs(hero.y - j.y) < 150) { j.got = true; G.stats.jewels = (G.stats.jewels || 0) + 1; G.score += 80; AU.sfx('lotus'); pop(j.x, j.y - 20, '+', '#ffe27a', 18); }
       });
       if (hero.x >= len) {
         if (deer && !deer.dead) { deer.dead = true; deer.reveal = 0.01; banner(tr(seg.cry || seg.endText), '', 2); }
@@ -1346,14 +1365,24 @@
       w.plats.forEach(function (p) { drawPlat(p, cam); });
       // wind zone streaks
       (seg.wind || []).forEach(function (z) { var x0 = z[0] - cam, x1 = z[1] - cam; if (x1 < 0 || x0 > W) return; g.fillStyle = 'rgba(220,235,255,0.06)'; g.fillRect(Math.max(0, x0), 0, Math.min(W, x1) - Math.max(0, x0), GY); });
-      obs.forEach(function (o) { if (o.dead) return; var x = o.x - cam; if (x < -200 || x > W + 200) return; drawObs(o, x); });
+      obs.forEach(function (o) {
+        if (o.dead) return; var x = o.x - cam; if (x < -200 || x > W + 260) return;
+        var ahead = o.x - hero.x;
+        if (ahead > 40 && ahead < 560 && o.t !== 'deer' && o.t !== 'cave') {
+          var down = o.t === 'branch';
+          ART.text(g, down ? '↓' : '↑', x, (o.yy || GY - 150) - 36, { size: 26, align: 'center', col: down ? '#ffb0a0' : '#ffe27a', sw: 4, bold: true });
+        }
+        if (x < -200 || x > W + 200) return;
+        drawObs(o, x);
+      });
       arrows.forEach(function (a) { drawArrow(g, a, cam); });
       jewels.forEach(function (j) {
         if (j.got) return;
         var jx = j.x - cam; if (jx < -20 || jx > W + 20) return;
-        ART.glow(g, jx, j.y, 16, 'rgba(255,210,80,0.7)');
-        g.fillStyle = '#ffe9a0'; g.beginPath(); g.arc(jx, j.y, 6, 0, 6.283); g.fill();
+        ART.glow(g, jx, j.y, 28, 'rgba(255,210,80,0.85)');
+        g.fillStyle = '#ffe9a0'; g.beginPath(); g.arc(jx, j.y, 9, 0, 6.283); g.fill();
         g.strokeStyle = '#c08020'; g.lineWidth = 2; g.stroke();
+        g.fillStyle = '#fff'; g.beginPath(); g.arc(jx - 2, j.y - 2, 3, 0, 6.283); g.fill();
       });
       drawHero(g, hero, cam, { glow: G.meter >= 100 ? 'rgba(255,220,140,0.5)' : null });
       ART.drawParts(g, cam, false);
@@ -1619,6 +1648,7 @@
       ART.text(g, tr(F.name), bx + bw, 86, { size: 14, align: 'right', gold: true });
       ART.bar(g, bx, 98, bw, 14, train ? (1 - F.hp / F.max) : (F.hp / F.max), train ? '#7ad0ff' : '#d05848');
       if (F.roster.length > 1) ART.text(g, (F.rosterI + 1) + ' / ' + F.roster.length, bx - 8, 110, { size: 13, align: 'right', col: '#ffe0b0' });
+      ART.text(g, (SAVE.lang === 'hi' ? 'सटीक ' : 'Perfect ') + (G.stats.perfect || 0), bx, 122, { size: 13, col: '#ffe27a' });
     };
     return M;
   }
@@ -1774,6 +1804,7 @@
           if (t.r <= 34 && t.r >= 8) { t.done = 'ok'; S = Math.min(100, S + 8); G.score += 300; AU.sfx('good'); pop(t.x, t.y - 50, T('steady'), '#bfe8ff', 24, true); ART.spawn('ring', t.x, t.y, { r: 20, life: 0.6, col: 'rgba(200,230,255,0.9)', speed: 0, screen: true }); }
           else if (t.r > 34) { t.done = 'soon'; S -= 10; AU.sfx('miss'); pop(t.x, t.y - 50, T('tooSoon'), '#ffb0a0', 22, true); }
         }
+        if (!t.done && !t._ping && t.r <= 34 && t.r >= 26) { t._ping = 1; AU.sfx('tick'); }
         if (!t.done && t.r <= 0) { t.done = 'miss'; S -= 25; shake(8); AU.sfx(t.k === 'pebble' ? 'hit' : 'whisper'); pop(t.x, t.y - 40, '−', '#ff9a7a', 30, true); }
       });
       threats = threats.filter(function (t) { if (t.done) { t.fade = (t.fade || 0) + dt; return t.fade < 0.4; } return true; });
@@ -1813,7 +1844,7 @@
         if (t.k === 'crown') { ART.glow(g, t.x, t.y, 80, 'rgba(255,215,90,0.8)'); drawCrown(t.x, t.y); ART.text(g, SAVE.lang === 'hi' ? 'सिंहासन...' : 'A throne...', t.x, t.y - 50, { size: 18, align: 'center', gold: true }); }
         if (t.k === 'battle') { ART.text(g, SAVE.lang === 'hi' ? 'याद करो वह रणक्षेत्र...' : 'Remember the field of ash...', t.x, t.y - 40, { size: 22, align: 'center', col: '#ffb090', sw: 4 }); }
         if (t.k === 'lightning') { g.strokeStyle = 'rgba(230,240,255,0.95)'; g.lineWidth = 3; g.beginPath(); g.moveTo(t.x, 8); g.lineTo(t.x - 16, t.y * 0.45); g.lineTo(t.x + 10, t.y * 0.62); g.lineTo(t.x - 4, t.y + 16); g.stroke(); ART.glow(g, t.x, t.y, 70, 'rgba(190,210,255,0.75)'); ART.text(g, SAVE.lang === 'hi' ? 'वज्र' : 'Lightning', t.x, t.y - 28, { size: 16, align: 'center', col: '#e7f1ff' }); }
-        if (!t.done) { var good = t.r <= 34 && t.r >= 8; g.strokeStyle = good ? '#bfe8ff' : 'rgba(255,255,255,0.7)'; g.lineWidth = good ? 5 : 3; g.beginPath(); g.arc(t.x, t.y, Math.max(1, t.r), 0, 6.283); g.stroke(); g.strokeStyle = 'rgba(190,230,255,0.4)'; g.lineWidth = 2; g.setLineDash([3, 4]); g.beginPath(); g.arc(t.x, t.y, 22, 0, 6.283); g.stroke(); g.setLineDash([]); }
+        if (!t.done) { var good = t.r <= 34 && t.r >= 8; g.strokeStyle = good ? '#fff4a0' : 'rgba(255,255,255,0.7)'; g.lineWidth = good ? 6 : 3; g.beginPath(); g.arc(t.x, t.y, Math.max(1, t.r), 0, 6.283); g.stroke(); g.strokeStyle = 'rgba(190,230,255,0.4)'; g.lineWidth = 2; g.setLineDash([3, 4]); g.beginPath(); g.arc(t.x, t.y, 22, 0, 6.283); g.stroke(); g.setLineDash([]); if (good) ART.text(g, SAVE.lang === 'hi' ? 'अभी' : 'NOW', t.x, t.y + 6, { size: 16, align: 'center', col: '#fff6c8', sw: 3, bold: true }); }
         g.globalAlpha = 1;
       });
       ART.drawParts(g, 0, true);
@@ -2181,8 +2212,8 @@
         return;
       }
       var hold = IN.holdHeld();
-      bird.vy += (hold ? -700 : 420) * dt;
-      bird.vy = clamp(bird.vy, -280, 340);
+      bird.vy += (hold ? -380 : 260) * dt;
+      bird.vy = clamp(bird.vy, -160, 220);
       bird.y += bird.vy * dt;
       if (bird.y < 96) { bird.y = 96; bird.vy = 40; }
       if (bird.y > H - 64) { bird.y = H - 64; bird.vy = -40; hurtBird(); }
@@ -2262,13 +2293,15 @@
   function freshStats() { return { hits: 0, falls: 0, standards: 0, lotus: 0, perfect: 0, sparHits: 0, smash: 0, drillRetries: 0, wild: 0, trueShots: 0, breaks: 0, minSteady: 100, together: 0, bumps: 0, altarMin: 100, warning: 0, crowns: 0, phaseMisses: 0, boons: 0, accept: 0 }; }
   function cloneStats(s) { var o = freshStats(); if (s) for (var k in s) o[k] = s[k]; return o; }
   function clearMarks(seg) {
-    function wipe(lines) { (lines || []).forEach(function (ln) { if (ln) { ln._st = 0; ln._fx = 0; } }); }
+    function wipe(lines) { (lines || []).forEach(function (ln) { if (ln) { ln._st = 0; ln._fx = 0; ln._runCounted = 0; ln._fxRun = 0; } }); }
     if (!seg) return;
     wipe(seg.lines); wipe(seg.goal && seg.goal.line);
     (seg.npcs || []).forEach(function (n) { wipe(n.lines); });
   }
+  function clearLevelMarks(L) { if (L && L.segs) L.segs.forEach(clearMarks); }
   function startLevel(li, si) {
-    G.li = li; G.L = LEVELS[li]; G.pips = 3; G.meter = 0; G.score = 0; G.stats = freshStats();
+    G.li = li; G.L = LEVELS[li]; G.runId = (G.runId || 0) + 1; clearLevelMarks(G.L);
+    G.pips = 3; G.meter = 0; G.score = 0; G.stats = freshStats();
     G.day = G.L.dayTime || 0; G.focusLives = G.L.focusLives || 0; G.levelT = 0; G.segLog = [];
     G.camY = 0;
     startSeg(si || 0);
@@ -2721,7 +2754,7 @@
 
   SC.over = { name: 'over',
     enter: function () { this.t = 0; this.btns = [{ id: 'retry', x: W / 2 - 220, y: 330, w: 210, h: 50, label: T('retry'), primary: true }, { id: 'sel', x: W / 2 + 10, y: 330, w: 210, h: 50, label: T('levels') }]; },
-    update: function (dt) { this.t += dt; if (IN.confirmP()) this.go('retry'); },
+    update: function (dt) { this.t += dt; if (this.t > 0.35 && IN.confirmP()) this.go('retry'); },
     go: function (id) { AU.sfx('click'); if (id === 'retry') { G.pips = 3; if (G.L.focusLives && G.focusLives <= 0) G.focusLives = G.L.focusLives; if (G.L.dayTime && G.day <= 0) G.day = G.L.dayTime * 0.6; retrySection(); setScene(SC.play); } else setScene(SC.select); },
     down: function (p) { var b = menuBtnHit(this.btns, p.x, p.y); if (b) this.go(b.id); },
     draw: function () {
@@ -2740,7 +2773,7 @@
         { id: 'retry', x: W - 270, y: H - 140, w: 110, h: 44, label: T('retry'), size: 16 }, { id: 'sel', x: W - 150, y: H - 140, w: 110, h: 44, label: T('levels'), size: 16 }];
       ART.clearParts();
     },
-    update: function (dt) { this.t += dt; if (Math.random() < dt * 30) ART.spawn('petal', Math.random() * W, -10, { screen: true, ang: 1.7, spread: 0.6, speed: 80, life: 6, r: 4, col: ['#ffd27a', '#ffb6c8', '#fff'][Math.floor(Math.random() * 3)] }); if (IN.confirmP()) this.go('next'); },
+    update: function (dt) { this.t += dt; if (Math.random() < dt * 30) ART.spawn('petal', Math.random() * W, -10, { screen: true, ang: 1.7, spread: 0.6, speed: 80, life: 6, r: 4, col: ['#ffd27a', '#ffb6c8', '#fff'][Math.floor(Math.random() * 3)] }); if (this.t > 0.65 && IN.confirmP()) this.go('next'); },
     go: function (id) { AU.sfx('click'); if (id === 'next') { if (G.li + 1 >= LEVELS.length) setScene(SC.soon); else setScene(SC.card, G.li + 1); } else if (id === 'retry') setScene(SC.card, G.li); else setScene(SC.select); },
     down: function (p) { var b = menuBtnHit(this.btns, p.x, p.y); if (b) this.go(b.id); },
     draw: function () {
@@ -2756,8 +2789,15 @@
       var y = 232;
       L.stars.forEach(function (s, j) { var ok = j === 0 || (j === 1 ? R.s2 : R.s3); ART.text(g, (ok ? '✓ ' : '✗ ') + tr(s), 54, y + j * 26, { size: 16, col: ok ? '#bfffc0' : '#ffb0a0' }); });
       var st = G.stats, rows = [];
-      var show = { standards: 'War-standards', lotus: 'Hidden lotus', falls: 'Falls', hits: 'Hits taken', perfect: 'Perfect shots', sparHits: 'Spar hits taken', smash: 'Smashed / cleared', drillRetries: 'Drill retries', wild: 'Wild shots', trueShots: 'True shots', breaks: 'Focus breaks', minSteady: 'Lowest steadiness', together: 'Together hits', altarMin: 'Sacrifice fire', warning: 'Warning heard', crowns: 'Crowns kindled', phaseMisses: 'Mistimed lifts', boons: 'Boons heard', accept: 'Rama accepts', deer: 'The deer falls', jewels: 'Ornaments', vow: 'The vow', south: 'The way south', alms: 'The alms', line: 'The line' };
-      [L.star2.stat, L.star3.stat].forEach(function (k2) { rows.push((SAVE.lang === 'hi' ? k2 : show[k2]) + ': ' + st[k2]); });
+      var show = {
+        standards: ['War-standards', 'युद्ध-ध्वज'], lotus: ['Hidden lotus', 'छिपा कमल'], falls: ['Falls', 'गिरना'], hits: ['Hits taken', 'चोटें'],
+        perfect: ['Perfect blows', 'सटीक प्रहार'], sparHits: ['Spar hits taken', 'मुक़ाबले की चोटें'], smash: ['Cleared', 'हटाए'], drillRetries: ['Drill retries', 'अभ्यास दोहराव'],
+        wild: ['Wild shots', 'भटके बाण'], trueShots: ['True shots', 'सच्चे बाण'], breaks: ['Focus breaks', 'एकाग्रता टूटी'], minSteady: ['Lowest steadiness', 'न्यूनतम स्थिरता'],
+        together: ['Together hits', 'साथ के वार'], altarMin: ['Sacrifice fire', 'यज्ञ की अग्नि'], warning: ['Warning heard', 'चेतावनी सुनी'], crowns: ['Crowns kindled', 'मुकुट जागे'],
+        phaseMisses: ['Mistimed lifts', 'ताल से चूके'], boons: ['Boons heard', 'वर सुने'], accept: ['Rama accepts', 'राम स्वीकार करते हैं'], deer: ['The deer falls', 'मृग गिरा'],
+        jewels: ['Ornaments', 'गहने'], vow: ['The vow', 'प्रतिज्ञा'], south: ['The way south', 'दक्षिण का मार्ग'], alms: ['The alms', 'भिक्षा'], line: ['The line', 'रेखा'], offer: ['The offer heard', 'प्रस्ताव सुना']
+      };
+      [L.star2.stat, L.star3.stat].forEach(function (k2) { var lab = show[k2]; rows.push((lab ? (SAVE.lang === 'hi' ? lab[1] : lab[0]) : k2) + ': ' + (st[k2] || 0)); });
       ART.text(g, rows.join('    '), 54, y + 92, { size: 15, col: '#ffe0b0' });
       ART.text(g, T('score') + ': ' + R.score + (R.newBest ? '   ★ ' + T('best') + '!' : '   (' + T('best') + ' ' + R.best.score + ')'), 54, y + 126, { size: 22, gold: true });
       drawBtns(this.btns);

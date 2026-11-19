@@ -41,12 +41,12 @@
           ['dash', 'I will return with a power no god can take from me.', 'मैं ऐसी शक्ति लेकर लौटूँगा जिसे कोई देवता मुझसे छीन न सके।']
         ]) },
       { type: 'platform', hero: 'dash', theme: 'ash', len: 5650, music: 'play',
-        ground: [[0, 900], [1040, 1900], [2160, 3000], [3200, 4200], [4380, 5650]],
+        ground: [[0, 1020], [1140, 1900], [2160, 3000], [3200, 4200], [4380, 5650]],
         pits: 'fire',
         plats: [{ x: 1220, y: 330, w: 230, k: 'ledgeRuin' }, { x: 2660, y: 320, w: 210, k: 'ledgeRuin' }, { x: 2930, y: 205, w: 190, k: 'ledgeRuin' },
           { x: 4560, y: 330, w: 230, k: 'ledgeRuin' }, { x: 3560, y: 320, w: 200, k: 'ledgeRuin' }],
         solids: [{ x: 520, w: 92, h: 74, k: 'pillarBroken' }, { x: 2420, w: 100, h: 104, k: 'pillarBroken' }, { x: 3780, w: 92, h: 74, k: 'pillarBroken' }, { x: 5000, w: 92, h: 74, k: 'pillarBroken' }],
-        foes: [{ t: 'spirit', x: 1600 }, { t: 'jackal', x: 2700 }, { t: 'spirit', x: 3450 }, { t: 'spirit', x: 4000 }, { t: 'jackal', x: 5150 }],
+        foes: [{ t: 'spirit', x: 2100 }, { t: 'jackal', x: 2700 }, { t: 'spirit', x: 3450 }, { t: 'spirit', x: 4000 }, { t: 'jackal', x: 5150 }],
         items: [{ t: 'standard', x: 1335, y: 330 }, { t: 'standard', x: 3025, y: 205 }, { t: 'standard', x: 4675, y: 330 }],
         checkpoints: [60, 1080, 2200, 3240, 4420],
         decor: [{ k: 'fire', x: 320, s: 0.5 }, { k: 'fire', x: 1750, s: 0.45 }, { k: 'deadtree', x: 2250, s: 0.7, sh: 'scen' }, { k: 'arch', x: 3300, s: 0.75, sh: 'scen' }, { k: 'fire', x: 4300, s: 0.4 }],
@@ -55,7 +55,7 @@
           { x: 3300, t: L('Three quick taps with a full meter: blade storm!', 'पूरा मीटर हो तो तीन तेज़ टैप: खड्ग-तूफ़ान!') }],
         goal: { x: 5450, k: 'shrine', line: D([['dash', 'Here the road turns north. Kubera rules golden Lanka; I own nothing but this blade. Then let the mountain make me.', 'यहाँ से मार्ग उत्तर को मुड़ता है। कुबेर स्वर्ण लंका पर राज करता है; मेरे पास इस खड्ग के सिवा कुछ नहीं। तो पर्वत ही मुझे गढ़ेगा।']]) } },
       { type: 'runner', hero: 'dash', theme: 'ash', len: 7800, speed: 390, jumpOnly: true, seed: 11,
-        fixed: [{ t: 'rock', x: 1100 }, { t: 'gap', x: 1900, w: 170 }, { t: 'rock', x: 2700 }, { t: 'gap', x: 3500, w: 210 }, { t: 'masonry', x: 4300 }, { t: 'gap', x: 5100, w: 250 }, { t: 'rock', x: 5900 }, { t: 'gap', x: 6600, w: 180 }],
+        fixed: [{ t: 'rock', x: 1900 }, { t: 'gap', x: 2600, w: 160 }, { t: 'rock', x: 3400 }, { t: 'gap', x: 4200, w: 190 }, { t: 'masonry', x: 5000 }, { t: 'gap', x: 5800, w: 200 }, { t: 'rock', x: 6500 }, { t: 'gap', x: 7100, w: 160 }],
         tips: [{ x: 60, t: L('Break into a run! Jump: tap left side / Space', 'दौड़ पड़ो! कूदो: बाईं ओर टैप / Space') }],
         endText: L('The mountain road', 'पर्वत का मार्ग') }
     ]
@@ -197,7 +197,7 @@
         goal: { x: 2500, k: 'flag' } },
       { type: 'beat', hero: 'rama', theme: 'sand', drill: 2, need: 4, arrows: 7, music: 'calm',
         drillName: L('Drill 2 · The held aim', 'अभ्यास 2 · स्थिर लक्ष्य'),
-        tips: [{ t: L('HOLD (Space / hold left side) to draw. RELEASE on the drum beat, when the rings meet.', 'खींचने के लिए दबाए रखो (Space / बायाँ भाग)। ढोल की थाप पर, जब वलय मिलें, छोड़ो।') }] },
+        tips: [{ t: L('HOLD about three seconds, until the bar is full. RELEASE on the drum, when the rings meet.', 'लगभग तीन क्षण दबाए रखो, जब पट्टी भर जाए। ढोल की थाप पर, जब वलय मिलें, छोड़ो।') }] },
       { type: 'platform', hero: 'rama', theme: 'sand', len: 2400, drill: 3, music: 'play', arrows: 10,
         drillName: L('Drill 3 · The moving target', 'अभ्यास 3 · चलता लक्ष्य'),
         ground: [[0, 2400]],
