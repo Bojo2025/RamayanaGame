@@ -1,4 +1,4 @@
-# Ramayana · Path of Dharma (levels 1–8)
+# Ramayana · Path of Dharma (levels 1–14)
 
 **Developed by Mr Boyjonauth Kevin · Bojo Solutions**
 
@@ -39,8 +39,14 @@ Every asset is embedded in `js/assets.js`, so the game also runs from `file://`.
 6. Sita's Archery Focus: three focus marks (wind, gusts, shouts, birds, a moving target), walks between them, and a global daylight meter.
 7. Ravana Begins Penance: a 120 s stay-put meditation. Hold to stay; tap the closing rings on pebbles, whispers, a crown and a battle memory.
 8. Young Rama and Lakshmana Together: a tag-team platformer with "together" hits, swinging sandbags, a boost wall and the straw boar.
+9. Ravana's Penance Deepens: a harder stay-put meditation in a night storm, then Brahma arrives.
+10. Receiving the Boon: a story audience. Dashanan asks to be unslayable by every being he respects, and not by mankind. The crowns begin to kindle.
+11. Conquest of Lanka: a fixed-screen fight through Kubera's gate, then a short run up to the palace.
+12. Tataka: a fixed-screen bout. Vishvamitra steadies Rama; the sage does not draw the bow.
+13. Protecting the Sacrifice: walk to the altar, hold it against the host, then face Subahu. Maricha is cast far, not slain.
+14. Journey to Mithila: a runner along the road to Janaka's gates.
 
-The 9–30 chronicle card lists the rest of the story (`js/levels2.js`).
+After level 14 the game shows a "to be continued" card. Levels 15–30 stay listed in the chronicle (`js/levels2.js`) until the next batch. Painted art for 9–14 loads from `js/assets2.js` after the opening eight, so levels 1–8 still start on the original file.
 
 ## Structure
 ```
@@ -50,10 +56,10 @@ js/audio.js    WebAudio: Indian-classical procedural score (tanpura, tabla, bans
 js/art.js      parallax plates, scenery layers, textured ground, particles, weather, fog, glow, UI widgets
 js/sprites.js  atlas drawing (feet anchors, flip, tint, portraits)
 js/levels.js   levels 1–8 as data (bilingual EN/HI)
-js/levels2.js  titles for levels 9–30
+js/levels2.js  playable levels 9–14; titles for 15–30
+js/assets2.js  lazy-loaded plates and sprites for levels 9–14
 js/game.js     loop, input, physics, the six play modes, menus, save, demo autopilot, test hooks
-tools/make_assets.py   art pipeline (chroma key → atlases → assets.js)
-tools/test_headless.js Playwright test: every level/segment, 0-error check, autopilot wins, screenshots
+tools/test_levels_9_14.js  Playwright: autopilot levels 9–14, smoke 1 and 8, screenshots
 ```
 Saves go to localStorage `rpd_save_v1` (unlocked, best score and stars per level, language, mute, vibration).
 

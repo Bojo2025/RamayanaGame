@@ -20,6 +20,17 @@
       Promise.all(fs.map(function (f) { return f.load().then(function (ff) { document.fonts.add(ff); }); })).then(fin, fin);
     } catch (e) { fin(); }
   };
+  R.loadExtra = function (done) {
+    var extra = window.RPD_ASSETS2 || {};
+    var keys = Object.keys(extra).filter(function (k) { return typeof extra[k] === 'string' && extra[k].indexOf('data:image') === 0; });
+    if (!keys.length) { done && done(); return; }
+    var left = keys.length;
+    keys.forEach(function (k) {
+      var im = new Image();
+      function fin() { if (--left <= 0 && done) done(); }
+      im.onload = fin; im.onerror = fin; im.src = extra[k]; R.img[k] = im;
+    });
+  };
   R.pattern = function (g, name) {
     if (R.pat[name]) return R.pat[name];
     var im = R.img[name]; if (!im || !im.width) return null;
@@ -35,7 +46,14 @@
     sand: { plate: 'bg5', tex: 'texSand', top: '#c8a060', lip: '#9a7440', lipHi: '#f4d49a', grade: 'rgba(255,190,110,0.08)', haze: [250, 220, 170], weather: 'dust', mid: ['banyan', 'banana', 'reeds'], midTint: 'rgba(245,215,160,0.32)', amb: 'court', fg: 'grass', grassCol: '#8a8a3a' },
     range: { plate: 'bg6', tex: 'texGrass', top: '#5a7a2a', lip: '#3e5a1e', lipHi: '#b4d46a', grade: 'rgba(255,170,90,0.10)', haze: [255, 210, 160], weather: 'leaves', mid: ['ashoka', 'reeds', 'banyan'], midTint: 'rgba(255,200,150,0.30)', amb: 'range', fg: 'grass', grassCol: '#8aa83a' },
     peak: { plate: 'bg7', tex: 'texRock', top: '#2a2a38', lip: '#1c1c28', lipHi: '#7a6a9a', grade: 'rgba(40,30,90,0.12)', haze: [90, 80, 140], weather: 'stars', mid: [], midTint: 'rgba(40,30,80,0.4)', amb: 'peak', fg: null, grassCol: null },
-    field: { plate: 'bg8', tex: 'texGrass', top: '#5a8a2a', lip: '#3e6a1e', lipHi: '#c4e47a', grade: 'rgba(255,240,180,0.04)', haze: [235, 245, 255], weather: 'petals', mid: ['banyan', 'ashoka', 'banana', 'reeds'], midTint: 'rgba(225,235,245,0.25)', amb: 'yard', fg: 'grass', grassCol: '#7aa83a' }
+    field: { plate: 'bg8', tex: 'texGrass', top: '#5a8a2a', lip: '#3e6a1e', lipHi: '#c4e47a', grade: 'rgba(255,240,180,0.04)', haze: [235, 245, 255], weather: 'petals', mid: ['banyan', 'ashoka', 'banana', 'reeds'], midTint: 'rgba(225,235,245,0.25)', amb: 'yard', fg: 'grass', grassCol: '#7aa83a' },
+    storm: { plate: 'bg9', tex: 'texRock', top: '#2c2a3a', lip: '#1a1a28', lipHi: '#9aa6c4', grade: 'rgba(20,24,60,0.2)', haze: [30, 40, 70], weather: 'rain', mid: [], amb: 'peak', fg: null, grassCol: null },
+    brahma: { plate: 'bg10', tex: 'texRock', top: '#3a3454', lip: '#241c38', lipHi: '#f0d48a', grade: 'rgba(255,210,120,0.1)', haze: [255, 214, 150], weather: 'stars', mid: [], amb: 'peak', fg: null, grassCol: null },
+    lanka: { plate: 'bg11', tex: 'texAsh', top: '#2a2218', lip: '#140e0a', lipHi: '#d4a85a', grade: 'rgba(90,40,10,0.14)', haze: [70, 40, 16], weather: 'embers', mid: ['lankaTower', 'gardenShrub', 'lankaTower'], midSheet: 'scenery_9_30', amb: 'battle', fg: null, grassCol: null },
+    streets: { plate: 'bg11b', tex: 'texAsh', top: '#3a2c1c', lip: '#22160e', lipHi: '#e0b060', grade: 'rgba(70,36,12,0.12)', haze: [90, 55, 24], weather: 'embers', mid: ['lankaTower', 'gardenShrub', 'bamboo'], midSheet: 'scenery_9_30', amb: 'battle', fg: null, grassCol: null },
+    tataka: { plate: 'bg12', tex: 'texEarth', top: '#4a4030', lip: '#2a2416', lipHi: '#b0a080', grade: 'rgba(30,40,16,0.14)', haze: [70, 80, 40], weather: 'leaves', mid: ['witheredTree', 'thornBush', 'witheredTree', 'fern'], midSheet: 'scenery_9_30', amb: 'mountain', fg: null, grassCol: '#3e4a28' },
+    yagna: { plate: 'bg13', tex: 'texSand', top: '#8a6840', lip: '#5a3c24', lipHi: '#f0d0a0', grade: 'rgba(255,140,50,0.08)', haze: [255, 176, 110], weather: 'embers', mid: ['bamboo', 'mango', 'fern', 'mango'], midSheet: 'scenery_9_30', amb: 'yard', fg: null, grassCol: '#6a8a38' },
+    road: { plate: 'bg14', tex: 'texGrass', top: '#5e842c', lip: '#3a5a1c', lipHi: '#d8ec8a', grade: 'rgba(255,220,160,0.06)', haze: [255, 226, 180], weather: 'leaves', mid: ['mango', 'bamboo', 'goldenTree', 'fern'], midSheet: 'scenery_9_30', amb: 'range', fg: null, grassCol: '#78a438' }
   };
 
   // painted plate, mirror-tiled so parallax never shows a seam
@@ -59,7 +77,7 @@
       if (h < 0.28) continue;
       var nm = list[Math.floor(h * 97) % list.length], x = i * spacing - off + (h * 200 - 100);
       var s = scale * (0.75 + 0.4 * ((h * 7) % 1));
-      sp.draw(g, 'scen', nm, x, groundY + 6, { s: s, cx: true, face: h > 0.6 ? -1 : 1 });
+      sp.draw(g, th.midSheet || 'scen', nm, x, groundY + 6, { s: s, cx: true, face: h > 0.6 ? -1 : 1 });
     }
     if (tint) { g.fillStyle = tint; }
   };
@@ -148,7 +166,7 @@
   // continuous screen-space weather
   R.weather = function (kind, dt, W, H, wind) {
     wind = wind || 0;
-    var rate = { embers: 26, petals: 7, leaves: 10 + Math.abs(wind) * 0.06, mist: 1.2, stars: 2, dust: 6 }[kind] || 0;
+    var rate = { embers: 26, petals: 7, leaves: 10 + Math.abs(wind) * 0.06, mist: 1.2, stars: 2, dust: 6, rain: 80 }[kind] || 0;
     var n = rate * dt; if (Math.random() < n % 1) n = Math.ceil(n); else n = Math.floor(n);
     for (var i = 0; i < n; i++) {
       if (kind === 'embers') R.spawn('ember', Math.random() * W, H + 10, { screen: true, ang: -1.57, spread: 0.6, speed: 60 + Math.random() * 60, life: 3.5, r: 1.6, col: Math.random() < 0.5 ? '#ffb050' : '#ff6a2a' });
@@ -156,6 +174,7 @@
       else if (kind === 'leaves') R.spawn('leaf', wind < 0 ? W + 10 : -10, Math.random() * H * 0.8, { screen: true, ang: wind < 0 ? 3.0 : 0.25, spread: 0.5, speed: 120 + Math.abs(wind) * 0.8, life: 7, r: 4, col: ['#c8582a', '#e8a03a', '#9a3a1a', '#d8c04a'][Math.floor(Math.random() * 4)] });
       else if (kind === 'stars') R.spawn('star', Math.random() * W, Math.random() * H * 0.45, { screen: true, speed: 1, life: 2.5, r: 3, col: 'rgba(255,250,230,0.9)' });
       else if (kind === 'dust') R.spawn('dust', -10, H * (0.5 + Math.random() * 0.4), { screen: true, ang: -0.1, spread: 0.3, speed: 50, life: 10, r: 1.6, col: 'rgba(255,230,180,0.7)' });
+      else if (kind === 'rain') R.spawn('drop', Math.random() * W, -12, { screen: true, ang: 1.35 + wind * 0.001, spread: 0.08, speed: 640, life: 0.7, r: 1.15, col: 'rgba(186,206,230,0.7)', g: 200 });
     }
   };
 

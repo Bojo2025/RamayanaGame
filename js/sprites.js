@@ -7,6 +7,9 @@
   var DATA = window.RPD_SPRITES || {};
   // native facing of each sheet (1 = faces right, -1 = faces left)
   var FACE = { rama: 1, dash: 1, sita: 1, lak: 1, ascetic: 1, teacher: -1, foe: -1, prop: 1, terr: 1, scen: 1, key: 1,
+    rama_adult: 1, lak_adult: 1, ravanan: 1, tataka: 1, subahu: 1, rakshasa: 1, lanka_guards: 1,
+    puppet_brahma: 1, puppet_vishvamitra: 1, puppet_dashanan_boon: 1, puppet_rama_story: 1, puppet_lak_story: 1,
+    props_9_30: 1, scenery_9_30: 1, terrain_9_30: 1, foes_forest: 1,
     npc: { kaikasi: 1, kaushalya: -1, dasharatha: -1, vasishtha: -1 } };
   var tintCache = {};
 
@@ -18,6 +21,20 @@
       im.onload = function () { S.ok[k] = true; S.loaded++; if (S.loaded >= S.total && done) done(); };
       im.onerror = function () { S.ok[k] = false; S.loaded++; if (S.loaded >= S.total && done) done(); };
       im.src = DATA[k].src; S.imgs[k] = im;
+    });
+  };
+  // Levels 9–30 art arrives in window.RPD_SPRITES2 after the opening eight have already started.
+  S.loadExtra = function (done) {
+    var extra = window.RPD_SPRITES2 || {}, keys = Object.keys(extra);
+    if (!keys.length) { S.extra = true; done && done(); return; }
+    var left = keys.length;
+    keys.forEach(function (k) {
+      DATA[k] = extra[k];
+      var im = new Image();
+      function fin(ok) { S.ok[k] = ok; if (--left <= 0) { S.extra = true; done && done(); } }
+      im.onload = function () { fin(true); };
+      im.onerror = function () { fin(false); };
+      im.src = extra[k].src; S.imgs[k] = im;
     });
   };
   S.has = function (sh, fr) { return !!(S.ok[sh] && DATA[sh].f[fr]); };
